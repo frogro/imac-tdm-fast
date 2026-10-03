@@ -62,7 +62,7 @@ typedef struct key_type {
   uint8_t data_type[APPLESMC_KEY_TYPE_LEN];
   uint8_t flags;
 } __attribute__((packed)) key_type;
- 
+
 
 /* wait_read - Wait for a byte to appear on SMC port. */
 static int
@@ -203,7 +203,7 @@ main(int argc, char **argv)
            (uint8_t)kt.data_type[i]);
   printf("\" length=%d flags=%x\n", kt.data_len, kt.flags);
 
-  if (read_smc(APPLESMC_READ_CMD, 
+  if (read_smc(APPLESMC_READ_CMD,
                (uint8_t *)argv[1], data_buf, kt.data_len) != 0) {
     fprintf(stderr, "\nread_smc get_key_data error\n\n");
     return -4;
