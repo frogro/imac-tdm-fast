@@ -13,8 +13,8 @@
     },
     {
       "path": "boot/fast.gz",
-      "size": 53238,
-      "sha256": "f4d66799b5f533a56df5f0029ddc0327f71d142c5ff0a53441f682ba2cfa4e34"
+      "size": 98222,
+      "sha256": "75dd8cd483d3a94e569083d1bf569f102c8c8865da4956ca3fd181c23b346049"
     },
     {
       "path": "boot/splash.png",
@@ -23,8 +23,8 @@
     },
     {
       "path": "grub.cfg",
-      "size": 669,
-      "sha256": "8e98dc144c89b21522dfd0d20ef365b5bc61c085e8ace903c953a77ea9df384c"
+      "size": 822,
+      "sha256": "cb70ead87790c6f1dd663c209b2ed6a3be6a76f49760e8c1886687894545f4fc"
     }
   ]
 }

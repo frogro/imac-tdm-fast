@@ -33,16 +33,24 @@ def build():
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
         env = dict(os.environ, SOURCE_DATE_EPOCH='0')
-        for name, source in [('init', 'src/init.c'), ('smc', 'src/smc/SmcDumpKey.c')]:
+        for name, source in [('init', 'src/init.c'), ('smc', 'src/smc/SmcDumpKey.c'), ('health', 'src/health.c')]:
             subprocess.run(['musl-gcc', '-idirafter', '/usr/include', '-idirafter', '/usr/include/x86_64-linux-gnu', '-static', '-Os', '-s', '-Wall', '-Wextra', '-Werror',
                 '-fno-ident', '-Wl,--build-id=none', '-o', str(work/name), str(ROOT/source)], check=True, env=env)
         records = []
-        for name in ('dev', 'proc', 'sys'):
+        for name in ('dev', 'proc', 'sys', 'modules', 'run'):
             records.append((name, b'', stat.S_IFDIR | 0o755, 0, 0))
         records += [('dev/console', b'', stat.S_IFCHR | 0o600, 5, 1),
                     ('dev/null', b'', stat.S_IFCHR | 0o666, 1, 3)]
-        for name in ('init', 'smc'):
+        for name in ('init', 'smc', 'health'):
             records.append((name, (work/name).read_bytes(), stat.S_IFREG | 0o755, 0, 0))
+        modules = json.loads((ROOT/'vendor/modules/manifest.json').read_text())
+        if modules['kernel'] != provenance['kernel_version']:
+            raise ValueError('Module/kernel version mismatch')
+        for item in modules['files']:
+            data = (ROOT/'vendor/modules'/item['file']).read_bytes()
+            if hashlib.sha256(data).hexdigest() != item['sha256']:
+                raise ValueError('Module checksum mismatch: '+item['file'])
+            records.append(('modules/'+item['file'], data, stat.S_IFREG | 0o644, 0, 0))
         records.append(('splash.gray', (ROOT/'assets/apple.gray').read_bytes(), stat.S_IFREG | 0o644, 0, 0))
         records.append(('TRAILER!!!', b'', 0, 0, 0))
         payload = b''.join(entry(n, d, m, i, a, b) for i, (n,d,m,a,b) in enumerate(records, 1))

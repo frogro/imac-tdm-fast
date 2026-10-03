@@ -201,13 +201,23 @@ int main(void) {
         logmsg("ERROR: proc mount failed");
     if (mount("sysfs", "/sys", "sysfs", MS_NOSUID | MS_NODEV | MS_NOEXEC, NULL))
         logmsg("ERROR: sysfs mount failed");
-    draw_splash();
-    logmsg("Minimal RAM system started");
     char cmdline[4096] = "";
     read_text("/proc/cmdline", cmdline, sizeof cmdline);
     bool test = boot_flag(cmdline, "tdm.test=1");
+    bool diagnostic = boot_flag(cmdline, "tdm.diagnostics=1");
+    if (!diagnostic) draw_splash();
+    logmsg("Minimal RAM system started");
     pid_t worker = fork();
-    if (worker == 0) _exit(start_tdm(test));
+    if (worker == 0) {
+        if (diagnostic) logmsg("DIAGNOSTICS: display stays internal; TDM commands skipped");
+        else if (start_tdm(test)) logmsg("TDM startup failed; continuing with CPU/sensor setup");
+        /* SMC direct-I/O helper has exited before applesmc can claim its ports. */
+        if (test) execl("/health", "health", "--test", (char *)NULL);
+        else if (diagnostic) execl("/health", "health", "--diagnostics", (char *)NULL);
+        else execl("/health", "health", (char *)NULL);
+        logmsg("ERROR: cannot start CPU/thermal monitor");
+        _exit(1);
+    }
     if (worker < 0) logmsg("ERROR: cannot start TDM worker");
     for (;;) {
         discover_inputs();
@@ -215,9 +225,9 @@ int main(void) {
         pid_t child;
         while ((child = waitpid(-1, &status, WNOHANG)) > 0) {
             if (child == worker && (!WIFEXITED(status) || WEXITSTATUS(status)))
-                logmsg("TDM startup failed; power button remains available");
+                logmsg("TDM/health worker exited; power button remains available");
         }
-        if (poll(inputs, (nfds_t)input_count, 250) <= 0) continue;
+        if (poll(inputs, (nfds_t)input_count, 1000) <= 0) continue;
         for (int i = 0; i < input_count; i++) {
             if (inputs[i].revents & POLLIN) {
                 struct input_event ev;

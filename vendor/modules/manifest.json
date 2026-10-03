@@ -1,0 +1,27 @@
+{
+  "kernel": "6.6.8-tinycore64",
+  "files": [
+    {
+      "file": "acpi-cpufreq.ko",
+      "sha256": "0bbd969ed84dbb04494fab1df246695c7bae7562c8a4b9e1748049c0155af0c7",
+      "source": "tinycore-tdm@ae161a92deb09950d4419b2a60188cc7b92ac623/boot/corepure64.gz"
+    },
+    {
+      "file": "cpufreq_powersave.ko",
+      "sha256": "6a259aaad6369daa4bae38f8057fc6ebeea9800aee132911fcce750ff9445c1d",
+      "source": "tinycore-tdm@ae161a92deb09950d4419b2a60188cc7b92ac623/boot/corepure64.gz"
+    },
+    {
+      "file": "applesmc.ko",
+      "sha256": "3dc0652af9255f3601f3b758a832f7ce8bf3478d8b9a81e416cbc8a855e07efa",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/hwmon-6.6.8-tinycore64.tcz",
+      "archive_sha256": "44596320fd65e97de56e9b11334350403a5efecdfc097cfc418c07794587fdf6"
+    },
+    {
+      "file": "coretemp.ko",
+      "sha256": "70772754f6a7eaa45cadbfaa9fe5e3c62336388b9fea5bb929c3c3d485ec5539",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/hwmon-6.6.8-tinycore64.tcz",
+      "archive_sha256": "44596320fd65e97de56e9b11334350403a5efecdfc097cfc418c07794587fdf6"
+    }
+  ]
+}

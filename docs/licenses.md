@@ -13,7 +13,7 @@ und Lizenzhinweise bleiben in `src/smc/SmcDumpKey.c` und `src/smc/COPYING` erhal
 | --- | --- | --- |
 | Linux 6.6.8-tinycore64 | Unverändertes `boot/vmlinuz` aus dem festgelegten Upstream-Commit | GPL-2.0, Details im Kernelquelltext |
 | GRUB 2.14-2ubuntu2.1 | EFI-Image aus den Ubuntu-Modulen mit `grub-mkstandalone` erstellt | GPL-3.0-or-later, siehe `licenses/grub-copyright.txt` |
-| musl 1.2.5-3build1 | Statisch in die beiden Programme eingebunden | MIT und enthaltene Hinweise, siehe `licenses/musl-copyright.txt` |
+| musl 1.2.5-3build1 | Statisch in die drei Programme eingebunden | MIT und enthaltene Hinweise, siehe `licenses/musl-copyright.txt` |
 
 Die vollständigen Kernelquellen einschließlich TinyCore-Patches und Kernelkonfiguration,
 die GRUB-Quellen einschließlich Ubuntu-Patches sowie musl-Quellen sind als Dateien
@@ -35,3 +35,13 @@ setzt das Symbol auf einen schwarzen Hintergrund. Apple und das Apple-Logo sind
 Marken von Apple Inc.; das Projekt steht in keiner Verbindung zu Apple.
 Die eingebettete ASCII-Schrift stammt aus dem GRUB-Paket, dessen Lizenzhinweise
 unter `licenses/grub-copyright.txt` enthalten sind.
+
+## Kernelmodule
+
+Die vier unveränderten Module unter `vendor/modules/` gehören zu
+Linux 6.6.8-tinycore64. Herkunft und Prüfsummen stehen in
+[`vendor/modules/manifest.json`](../vendor/modules/manifest.json).
+Die CPU-Module stammen aus dem ursprünglichen TinyCore-Initramfs, die
+Sensormodule aus der offiziellen TinyCore-Erweiterung `hwmon-6.6.8-tinycore64.tcz`.
+Die zugehörigen GPL-Kernelquellen und die Konfiguration sind im oben verlinkten
+Quellen-Release enthalten.

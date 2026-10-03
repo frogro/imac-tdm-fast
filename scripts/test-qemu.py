@@ -46,7 +46,8 @@ def test(screenshot=None):
                 deadline = start+60
                 while time.monotonic() < deadline:
                     text = log.read_text(errors='replace') if log.exists() else ''
-                    if 'Power button ready' in text and 'TEST: SMC hardware access disabled' in text: break
+                    if ('Power button ready' in text and 'TEST: SMC hardware access disabled' in text
+                        and 'Fan settings unchanged; no GPU modules loaded' in text): break
                     if proc.poll() is not None: raise RuntimeError('QEMU exited: '+(work/'qemu.log').read_text()+text)
                     time.sleep(.2)
                 else: raise RuntimeError('Boot timed out: '+text)

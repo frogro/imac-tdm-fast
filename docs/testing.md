@@ -2,10 +2,10 @@
 
 ## Automatisiert
 
-Neun Python-Tests prüfen Installer-Schutzmaßnahmen, Gerätewechsel vor dem Schreiben,
+Dreizehn Python-Tests prüfen Installer-Schutzmaßnahmen, Gerätewechsel vor dem Schreiben,
 Abbruch und Probelauf, Kopieren und Prüfsummen, Fehler beim Aushängen, das enge
 Downloadmanifest, Commit-Pinning und den tatsächlichen Inhalt des RAM-Dateisystems.
-Die beiden ELF-Programme haben keinen dynamischen Interpreter. GRUB prüft die
+Die drei ELF-Programme haben keinen dynamischen Interpreter. GRUB prüft die
 Konfigurationssyntax. Die C-Programme werden mit `-Wall -Wextra -Werror` gebaut.
 
 `scripts/test-qemu.py` erstellt eine temporäre GPT/FAT32-USB-Disk und startet sie
@@ -17,7 +17,7 @@ Geprüft am 3. Oktober 2026:
 
 - Firmware → USB-Boot → GRUB → Kernel → minimales `/init` erfolgreich.
 - RAM-System nach etwa **3,0 Sekunden Kernel-Laufzeit** bereit.
-- Gesamter QEMU-/OVMF-/USB-Start bis zur Testbereitschaft etwa **7,0 Sekunden**.
+- Gesamter QEMU-/OVMF-/USB-Start bis zur Testbereitschaft etwa **8,0 Sekunden**.
 - ACPI-Power-Tastendruck über QMP wird erkannt; die virtuelle Maschine schaltet aus.
 
 Diese Zeiten gelten für QEMU mit Softwareemulation auf dem Build-Rechner, nicht
@@ -33,7 +33,7 @@ SMC-Zugriffe deaktiviert sind. Hardwarezeiten dürfen daraus nicht abgeleitet we
 - Verhalten bei fehlendem Bildsignal sowie Neustart nach dem Ausschalten.
 
 Das ursprüngliche TDM-System funktionierte laut Besitzer am Originalstick.
-Diese neue Startumgebung wurde noch nicht am iMac getestet. Die physische
+Der Besitzer hat den Start am iMac bestätigt; die neue CPU-/Sensorergänzung ist dort noch nicht geprüft. Die physische
 Bildumschaltung wird nicht aus einer erfolgreichen SMC-Rückgabe abgeleitet.
 Ein per SHA-256 übernommener Kernel reduziert Änderungen an der Hardwarebasis;
 ein individuell verkleinerter Kernel ist eine mögliche spätere Optimierung.
@@ -43,8 +43,10 @@ ein individuell verkleinerter Kernel ist eine mögliche spätere Optimierung.
 Der Kernel startet `/init` als PID 1. Es bindet nur `/proc` und `/sys` ein und
 verwendet `/dev` im RAM. Da der TinyCore-Kernel kein devtmpfs bereitstellt,
 erzeugt es die Eingabegerätedateien anhand der vom Kernel gelieferten sysfs-Daten.
-Es lädt keine Module, insbesondere kein `applesmc`, das mit direkten SMC-Zugriffen
-kollidieren könnte. Interne Laufwerke und der Stick bleiben ungemountet.
+Nach Abschluss der direkten SMC-Umschaltung lädt ein separates Programm
+`acpi-cpufreq`, `cpufreq_powersave`, `coretemp` und `applesmc` für exakt diesen Kernel.
+Dadurch laufen direkte SMC-Befehle und der SMC-Treiber nicht gleichzeitig.
+GPU-Module sind nicht enthalten. Interne Laufwerke und der Stick bleiben ungemountet.
 
 Ein Kindprozess führt die originale Befehlsfolge aus: `MVHR=1`, eine Sekunde Pause,
 `MVMR=2`. Fehler brechen die Folge ab. Schreibfehler im übernommenen SMC-Programm
@@ -69,3 +71,17 @@ Der QEMU-Test liest nach dem Kernelstart den vollständigen Bildschirm zurück u
 vergleicht jedes RGB-Pixel mit dem erwarteten zentrierten Logo auf Schwarz. Danach
 prüft er wie bisher die ACPI-Power-Taste. Mit `--screenshot /pfad/bild.png` wird
 zusätzlich ein PNG der laufenden VM gespeichert.
+
+## CPU und Sensoren
+
+Fixture-Tests prüfen die Auswahl des Energiesparmodus, unveränderte Lüfterdateien,
+den Umgang mit fehlenden Sensoren und die Prüfsummen der vier Kernelmodule.
+QEMU prüft zusätzlich den Start der Überwachung und verträgliche Fehler bei
+nicht unterstützten virtuellen Sensoren. `tdm.test=1` verhindert auch das Laden
+von `applesmc`. QEMU kann weder Lüfterregelung noch Temperaturen des iMac bestätigen.
+
+`diagnostics.txt` auf dem Stick aktiviert eine Textkonsole und überspringt die
+Displayumschaltung. Ohne diese Datei bleibt der normale Start mit Logo aktiv.
+Die Sensorüberwachung verändert keine Lüfterwerte und ist kein zusätzlicher
+Überhitzungsschutz. CPU-Frequenz, Temperaturen und Lüfterdrehzahlen müssen noch
+am echten iMac überprüft werden.

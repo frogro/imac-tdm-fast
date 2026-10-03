@@ -37,9 +37,23 @@ Die Darstellung wurde in QEMU geprüft und muss am iMac noch bestätigt werden.
 Sehr frühe Anzeigen der Mac-Firmware oder des EFI-Laders liegen davor und können
 kurz sichtbar bleiben. Das Projekt ist kein Apple-Produkt.
 
-Linux- und Programmprotokolle gehen nur an die serielle Konsole. Für lokale
-Fehlersuche in `grub.cfg` die Optionen `console=ttyS0,115200`, `fbcon=map:1` und
-`loglevel=0` durch `console=tty0 loglevel=7` ersetzen.
+## Temperatur und Stromverbrauch
+
+Nach der Displayumschaltung aktiviert das System den CPU-Energiesparmodus,
+soweit der Prozessor ihn unterstützt. Es liest alle 15 Sekunden verfügbare
+Temperaturen und Lüfterdrehzahlen. Die automatische Lüfterregelung bleibt beim
+SMC des iMac; das Programm verändert keine Lüftervorgaben.
+**Es wird kein Grafiktreiber geladen.** Das Startlogo nutzt nur den vorhandenen
+Framebuffer. Ob der iMac dadurch kühler läuft, muss am Gerät gemessen werden.
+
+Zur Diagnose eine leere Datei **`diagnostics.txt`** im Hauptverzeichnis des
+USB-Sticks anlegen. Beim nächsten Start bleibt der iMac auf seiner internen
+Anzeige und zeigt die Messwerte statt in TDM umzuschalten. Datei anschließend
+löschen, um wieder direkt in TDM zu starten. Temperaturen in diesem Diagnosemodus
+können vom tatsächlichen Monitorbetrieb abweichen.
+
+Im normalen Betrieb bleiben die Messwerte auf der seriellen Konsole und in
+`/run/health.txt` im RAM; es gibt keinen SSH-Zugang und keine Speicherung auf dem Stick.
 
 ## Was ist schneller?
 
@@ -49,7 +63,7 @@ startet ein kleines RAM-Programm direkt als `/init`.
 
 Es gibt keine Menüwartezeit, keinen USB-Such-Timer, keine Netzwerkanmeldung,
 keine Paketverwaltung und keine Diagnose vor dem Umschalten. Das vollständige
-Bootpaket ist rund **7,5 MB** groß; das RAM-Dateisystem selbst nur rund **53 KB**.
+Bootpaket ist rund **7,5 MB** groß; das RAM-Dateisystem selbst nur rund **98 KB**.
 Die einsekündige Pause zwischen den beiden SMC-Befehlen des funktionierenden
 Originalsticks bleibt vorerst erhalten. Nach dem letzten Befehl folgt keine Pause.
 
@@ -119,7 +133,7 @@ python3 scripts/build.py
 python3 -m unittest discover -s tests -v
 ```
 
-Das baut `/init`, das SMC-Programm, `boot/fast.gz`, den EFI-Bootloader und das
+Das baut `/init`, die Sensorüberwachung, das SMC-Programm, `boot/fast.gz`, den EFI-Bootloader und das
 Downloadmanifest neu. `boot/vmlinuz` bleibt der per SHA-256 festgelegte Kernel aus
 dem ursprünglichen Repository. Es werden keine Systemdateien des Build-Rechners verändert.
 
