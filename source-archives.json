@@ -1,0 +1,42 @@
+[
+  {
+    "file": "linux-6.6.8-patched.txz",
+    "url": "http://tinycorelinux.net/15.x/x86_64/release/src/kernel/linux-6.6.8-patched.txz",
+    "sha256": "53b75249150beab55a2e725deb4b91f28b0ee42839800a41515f8916313c9ac1"
+  },
+  {
+    "file": "config-6.6.8-tinycore64",
+    "url": "http://tinycorelinux.net/15.x/x86_64/release/src/kernel/config-6.6.8-tinycore64",
+    "sha256": "afa3efc1ca56258156313abece58764e1219365bdcd4f08f685c96b9b6c2b121"
+  },
+  {
+    "file": "grub2_2.14.orig.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/grub2/grub2_2.14.orig.tar.xz",
+    "sha256": "bc8d3c73535b8838d8c8e2654d73edc4e6ae8c8acdb45d5df5dc9a1547446d43"
+  },
+  {
+    "file": "grub2_2.14-2ubuntu2.1.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/grub2/grub2_2.14-2ubuntu2.1.debian.tar.xz",
+    "sha256": "7bfc1a378230c266b1c1995ccdc42c32d5af6dd73ae2ab2d30dd346b3ff36b34"
+  },
+  {
+    "file": "grub2_2.14-2ubuntu2.1.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/grub2/grub2_2.14-2ubuntu2.1.dsc",
+    "sha256": "a422cc2b335c0344faed3a133d616bf653a98993429cdc8cd6fe5dc658c8cc52"
+  },
+  {
+    "file": "musl_1.2.5.orig.tar.gz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/universe/m/musl/musl_1.2.5.orig.tar.gz",
+    "sha256": "a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4"
+  },
+  {
+    "file": "musl_1.2.5-3build1.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/universe/m/musl/musl_1.2.5-3build1.debian.tar.xz",
+    "sha256": "fd50d32f31502322423ff94e982e97e53ca0902660849054414456bcf0dd4d0b"
+  },
+  {
+    "file": "musl_1.2.5-3build1.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/universe/m/musl/musl_1.2.5-3build1.dsc",
+    "sha256": "2d0342ff83e5560169b69b598bffcde12224fbdc298a9dbb5271602fd656ef46"
+  }
+]

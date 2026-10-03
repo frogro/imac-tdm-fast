@@ -1,0 +1,11 @@
+{
+  "upstream": "https://github.com/frogro/tinycore-tdm",
+  "commit": "ae161a92deb09950d4419b2a60188cc7b92ac623",
+  "kernel_sha256": "15ed5220a397e6960a9ac6f770a07e3cc209c6870c42cbf8f388aa409d11ea71",
+  "kernel_version": "6.6.8-tinycore64",
+  "kernel_source": "http://tinycorelinux.net/15.x/x86_64/release/src/kernel/",
+  "smc_source": "https://github.com/floe/smc_util",
+  "notes": "SMC source inherited from pinned upstream; write failures now return nonzero.",
+  "grub_package": "2.14-2ubuntu2.1",
+  "musl_package": "1.2.5-3build1"
+}

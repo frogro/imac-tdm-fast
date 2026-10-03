@@ -1,0 +1,17 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  boot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y musl-tools linux-libc-dev binutils grub-efi-amd64-bin grub-common qemu-system-x86 ovmf dosfstools mtools fdisk
+      - name: Check shipped payload
+        run: python3 -m unittest discover -s tests -v
+      - name: Boot shipped EFI and power off
+        run: python3 scripts/test-qemu.py
+      - name: Build from source and test
+        run: |
+          python3 scripts/build.py
+          python3 -m unittest discover -s tests -v
+          python3 scripts/test-qemu.py
