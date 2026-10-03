@@ -158,3 +158,9 @@ convert -background black assets/splash.svg -alpha off -depth 8 PNG24:boot/splas
 convert boot/splash.png -crop 180x180+1190+630 +repage -depth 8 gray:assets/apple.gray
 python3 scripts/build.py
 ```
+
+## Installation auf die interne Platte
+
+Ein separater [einmaliger Installationsstick](docs/internal-installer.md) kann die
+interne Seagate ST31000528AS mit 1 TB loeschen und TDM Fast dort installieren.
+Dieser Sondermodus startet die Installation automatisch und wird separat gebaut.

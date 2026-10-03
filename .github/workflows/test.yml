@@ -15,3 +15,8 @@ jobs:
           python3 scripts/build.py
           python3 -m unittest discover -s tests -v
           python3 scripts/test-qemu.py
+      - name: Build and test one-shot internal installer
+        run: |
+          sudo apt-get install -y busybox-static file util-linux
+          python3 scripts/build-disk-installer.py work/internal-installer
+          python3 scripts/test-disk-installer.py work/internal-installer
