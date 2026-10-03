@@ -4,13 +4,28 @@ Ein USB-Stick macht den **27″-iMac von Ende 2009** direkt zum Monitor.
 Kein Pi, kein WLAN-Taster und kein Bootmenü nötig.
 
 - **Stick eingesteckt:** Der iMac startet vom Stick und schaltet automatisch auf den externen Bildeingang.
-- **Stick entfernt:** Die Mac-Firmware startet das interne Betriebssystem.
+- **Stick entfernt:** Die Mac-Firmware kann auf ein vorhandenes bootfähiges internes Betriebssystem zurückfallen; dieses Verhalten am eigenen iMac prüfen.
 - **Powerknopf kurz drücken:** Das RAM-System fordert sofortiges Ausschalten an.
 - **Powerknopf länger gedrückt halten:** Die Hardware erzwingt das Ausschalten, auch wenn Software hängt.
 
 Voraussetzung für die automatische Auswahl: Die Mac-Firmware muss den eingesteckten
 USB-Stick bevorzugen. Das verändert dieser Installer nicht. Falls nötig, beim
 Einschalten **Alt/Option** halten und **EFI Boot** auswählen.
+
+Zum Speichern als Standard im Apple-Startmenü **Ctrl/Control** gedrückt halten:
+Wenn der Pfeil unter dem gewählten Laufwerk zu einem Kreispfeil wird, mit weiterhin
+gehaltener Ctrl-Taste starten. Danach einmal mit und einmal ohne Stick testen.
+Unter macOS gibt es außerdem **Systemeinstellungen → Startvolume**; reine Linux-
+EFI-Sticks werden dort nicht immer angeboten. Apple beschreibt die allgemeine
+[Wahl des Standard-Startlaufwerks](https://support.apple.com/en-sg/guide/mac-help/mchlp1034/mac).
+Die Ctrl-Methode ist auch im
+[rEFInd-Projektforum](https://sourceforge.net/p/refind/discussion/general/thread/b9b50e68e3/)
+beschrieben. Ob die Firmware dieses iMac den Eintrag dauerhaft übernimmt, muss
+am Gerät geprüft werden.
+
+Wenn intern gar kein bootfähiges OS vorhanden ist, kann der Mac den USB-Stick
+auch ohne gespeicherte USB-Priorität als einziges Bootziel finden. Ohne Stick
+startet in diesem Fall selbstverständlich kein internes System.
 Der iMac wird ausgeschaltet, bleibt am Stromnetz aber im Standby.
 
 ## Was ist schneller?
