@@ -26,3 +26,12 @@ für die Stick-Installation lädt der Installer nur das kleine Bootpaket.
 Beim Neubau auf einer anderen Distribution können musl-/GRUB-Versionen und damit
 Binärdateien abweichen; die Distribution liefert die dazugehörigen Paketquellen.
 Der verwendete Kernel wird beim Neubau ausdrücklich gegen `sources.json` geprüft.
+
+## Startgrafik
+
+Das Apple-Symbol stammt aus [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/apple.svg).
+Die CC0-Lizenz liegt unter `assets/simple-icons-LICENSE.md`. `assets/splash.svg`
+setzt das Symbol auf einen schwarzen Hintergrund. Apple und das Apple-Logo sind
+Marken von Apple Inc.; das Projekt steht in keiner Verbindung zu Apple.
+Die eingebettete ASCII-Schrift stammt aus dem GRUB-Paket, dessen Lizenzhinweise
+unter `licenses/grub-copyright.txt` enthalten sind.

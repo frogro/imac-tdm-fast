@@ -16,7 +16,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'frogro/imac-tdm-fast'
-REQUIRED = {'EFI/BOOT/BOOTX64.EFI', 'boot/vmlinuz', 'boot/fast.gz', 'grub.cfg'}
+REQUIRED = {'EFI/BOOT/BOOTX64.EFI', 'boot/vmlinuz', 'boot/fast.gz', 'boot/splash.png', 'grub.cfg'}
 OPTIONAL = set()
 COLUMNS = 'NAME,PATH,TYPE,SIZE,TRAN,RO,MODEL,SERIAL,MAJ:MIN,MOUNTPOINTS'
 

@@ -28,6 +28,19 @@ auch ohne gespeicherte USB-Priorität als einziges Bootziel finden. Ohne Stick
 startet in diesem Fall selbstverständlich kein internes System.
 Der iMac wird ausgeschaltet, bleibt am Stromnetz aber im Standby.
 
+## Startanzeige
+
+Beim Start erscheint ein weißes Apple-Logo auf schwarzem Hintergrund, ohne Menü,
+Text, Animation oder zusätzliche Wartezeit. Das RAM-System zeichnet das Logo
+nach dem Kernelstart erneut; anschließend übernimmt das externe TDM-Bild.
+Die Darstellung wurde in QEMU geprüft und muss am iMac noch bestätigt werden.
+Sehr frühe Anzeigen der Mac-Firmware oder des EFI-Laders liegen davor und können
+kurz sichtbar bleiben. Das Projekt ist kein Apple-Produkt.
+
+Linux- und Programmprotokolle gehen nur an die serielle Konsole. Für lokale
+Fehlersuche in `grub.cfg` die Optionen `console=ttyS0,115200`, `fbcon=map:1` und
+`loglevel=0` durch `console=tty0 loglevel=7` ersetzen.
+
 ## Was ist schneller?
 
 Das Projekt basiert auf [tinycore-tdm](https://github.com/frogro/tinycore-tdm),
@@ -36,7 +49,7 @@ startet ein kleines RAM-Programm direkt als `/init`.
 
 Es gibt keine Menüwartezeit, keinen USB-Such-Timer, keine Netzwerkanmeldung,
 keine Paketverwaltung und keine Diagnose vor dem Umschalten. Das vollständige
-Bootpaket ist rund **7,3 MB** groß; das RAM-Dateisystem selbst nur rund **51 KB**.
+Bootpaket ist rund **7,5 MB** groß; das RAM-Dateisystem selbst nur rund **53 KB**.
 Die einsekündige Pause zwischen den beiden SMC-Befehlen des funktionierenden
 Originalsticks bleibt vorerst erhalten. Nach dem letzten Befehl folgt keine Pause.
 
@@ -65,7 +78,7 @@ python3 install-usb.py --device /dev/sdX --dry-run
 sudo python3 install-usb.py --device /dev/sdX
 ```
 
-Der Installer lädt die vier Bootdateien von einem fest aufgelösten GitHub-Commit,
+Der Installer lädt die fünf Bootdateien von einem fest aufgelösten GitHub-Commit,
 prüft Größen und SHA-256 und verlangt vor dem Löschen die Eingabe
 `LOESCHEN /dev/sdX`. Danach erstellt er GPT und eine FAT32-EFI-Partition,
 kopiert und prüft die Dateien und hängt den Stick aus.
@@ -94,8 +107,7 @@ Shell-Zugang und keine Tastaturlayout-Einrichtung.
 
 Die SMC-Umschaltung ist auf die Modellkennungen `iMac10,1` und `iMac11,1` begrenzt;
 `iMac10,1` gibt es auch als 21,5″-Gerät, das hier **nicht unterstützt** wird.
-Auf anderen Modellkennungen unterbleiben SMC-Schreibzugriffe. Ein Fehler bleibt
-auf der Konsole sichtbar; der Powerknopf wird weiterhin überwacht.
+Auf anderen Modellkennungen unterbleiben SMC-Schreibzugriffe. Die Power-Taste wird auch bei einem TDM-Fehler weiterhin überwacht.
 
 ## Selbst bauen
 
@@ -123,3 +135,12 @@ virtuelle Maschine aus und deaktiviert SMC-Zugriffe ausdrücklich mit `tdm.test=
 Dieser Parameter gehört nicht auf den echten TDM-Stick.
 
 Herkunft und Lizenzen: [Drittkomponenten](docs/licenses.md), [sources.json](sources.json).
+
+Die Grafikquellen liegen unter `assets/`. Zum Neuerzeugen der Rasterdateien:
+
+```bash
+sudo apt install imagemagick librsvg2-bin
+convert -background black assets/splash.svg -alpha off -depth 8 PNG24:boot/splash.png
+convert boot/splash.png -crop 180x180+1190+630 +repage -depth 8 gray:assets/apple.gray
+python3 scripts/build.py
+```

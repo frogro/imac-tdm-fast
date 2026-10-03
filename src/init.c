@@ -6,6 +6,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/input.h>
+#include <linux/fb.h>
+#include <stdint.h>
+#include <sys/mman.h>
 #include <poll.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -42,6 +45,58 @@ static bool read_text(const char *path, char *buffer, size_t size) {
     buffer[n] = 0;
     buffer[strcspn(buffer, "\r\n")] = 0;
     return true;
+}
+/* Optional splash, never a prerequisite for TDM or the power button. */
+static void draw_splash(void) {
+    char numbers[64];
+    unsigned int major_num, minor_num;
+    if (!read_text("/sys/class/graphics/fb0/dev", numbers, sizeof numbers) ||
+        sscanf(numbers, "%u:%u", &major_num, &minor_num) != 2) return;
+    if (mknod("/dev/fb0", S_IFCHR | 0600, makedev(major_num, minor_num)) && errno != EEXIST) return;
+    int fd = open("/dev/fb0", O_RDWR | O_CLOEXEC);
+    if (fd < 0) return;
+    struct fb_fix_screeninfo f;
+    struct fb_var_screeninfo v;
+    if (ioctl(fd, FBIOGET_FSCREENINFO, &f) || ioctl(fd, FBIOGET_VSCREENINFO, &v)) {
+        close(fd); return;
+    }
+    unsigned int bytes = v.bits_per_pixel / 8;
+    if (f.type != FB_TYPE_PACKED_PIXELS || f.visual != FB_VISUAL_TRUECOLOR ||
+        (v.bits_per_pixel != 16 && v.bits_per_pixel != 24 && v.bits_per_pixel != 32) ||
+        v.xres < 180 || v.yres < 180 || v.xres > 16384 || v.yres > 16384 ||
+        v.red.length > 8 || v.green.length > 8 || v.blue.length > 8 ||
+        v.red.offset + v.red.length > v.bits_per_pixel ||
+        v.green.offset + v.green.length > v.bits_per_pixel ||
+        v.blue.offset + v.blue.length > v.bits_per_pixel ||
+        (uint64_t)(v.xoffset + v.xres) * bytes > f.line_length ||
+        (uint64_t)(v.yoffset + v.yres) * f.line_length > f.smem_len ||
+        f.smem_len > 256U * 1024 * 1024) { close(fd); return; }
+    unsigned char pixels[180 * 180];
+    int logo = open("/splash.gray", O_RDONLY | O_CLOEXEC);
+    if (logo < 0) { close(fd); return; }
+    size_t got = 0;
+    while (got < sizeof pixels) {
+        ssize_t n = read(logo, pixels + got, sizeof pixels - got);
+        if (n <= 0) break;
+        got += (size_t)n;
+    }
+    close(logo);
+    if (got != sizeof pixels) { close(fd); return; }
+    unsigned char *fb = mmap(NULL, f.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (fb == MAP_FAILED) { close(fd); return; }
+    for (unsigned int y = 0; y < v.yres; y++)
+        memset(fb + (size_t)(v.yoffset + y) * f.line_length + v.xoffset * bytes, 0, v.xres * bytes);
+    for (unsigned int y = 0; y < 180; y++) for (unsigned int x = 0; x < 180; x++) {
+        unsigned int g = pixels[y * 180 + x];
+        uint32_t color = ((g * ((1U << v.red.length) - 1) / 255) << v.red.offset) |
+                         ((g * ((1U << v.green.length) - 1) / 255) << v.green.offset) |
+                         ((g * ((1U << v.blue.length) - 1) / 255) << v.blue.offset);
+        size_t offset = (size_t)(v.yoffset + (v.yres - 180) / 2 + y) * f.line_length +
+                       (v.xoffset + (v.xres - 180) / 2 + x) * bytes;
+        memcpy(fb + offset, &color, bytes);
+    }
+    munmap(fb, f.smem_len); close(fd);
+    logmsg("Static splash drawn");
 }
 static bool boot_flag(const char *text, const char *flag) {
     size_t length = strlen(flag);
@@ -146,6 +201,7 @@ int main(void) {
         logmsg("ERROR: proc mount failed");
     if (mount("sysfs", "/sys", "sysfs", MS_NOSUID | MS_NODEV | MS_NOEXEC, NULL))
         logmsg("ERROR: sysfs mount failed");
+    draw_splash();
     logmsg("Minimal RAM system started");
     char cmdline[4096] = "";
     read_text("/proc/cmdline", cmdline, sizeof cmdline);

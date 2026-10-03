@@ -11,7 +11,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test():
+def test(screenshot=None):
     with tempfile.TemporaryDirectory(prefix='tdm-qemu-') as tmp:
         work = Path(tmp)
         fat = work/'esp.img'
@@ -55,13 +55,29 @@ def test():
                     sock.settimeout(5); sock.connect(str(qmp_path))
                     stream=sock.makefile('rwb',buffering=0)
                     json.loads(stream.readline())
-                    def command(name):
-                        stream.write(json.dumps({'execute':name}).encode()+b'\n')
+                    def command(name, arguments=None):
+                        stream.write(json.dumps({'execute':name, 'arguments': arguments or {}}).encode()+b'\n')
                         while True:
                             response=json.loads(stream.readline())
                             if 'error' in response: raise RuntimeError(response)
                             if 'return' in response: return
-                    command('qmp_capabilities'); command('system_powerdown')
+                    command('qmp_capabilities')
+                    check = work/'display.ppm'
+                    command('screendump', {'filename': str(check), 'format': 'ppm'})
+                    magic, dimensions, maximum, pixels = check.read_bytes().split(b'\n', 3)
+                    if magic != b'P6' or maximum != b'255': raise RuntimeError('Unexpected screenshot format')
+                    width, height = map(int, dimensions.split())
+                    expected = bytearray(width * height * 3)
+                    mask = (ROOT/'assets/apple.gray').read_bytes()
+                    for y in range(180):
+                        row = b''.join(bytes([g,g,g]) for g in mask[y*180:(y+1)*180])
+                        start = (((height-180)//2+y)*width+(width-180)//2)*3
+                        expected[start:start+len(row)] = row
+                    if pixels != expected: raise RuntimeError('Display differs from centered logo on black')
+                    print('PASS: screen contains only centered logo on black', flush=True)
+                    if screenshot:
+                        command('screendump', {'filename': str(Path(screenshot).resolve()), 'format': 'png'})
+                    command('system_powerdown')
                 proc.wait(timeout=10)
                 text=log.read_text(errors='replace')
                 if proc.returncode != 0 or 'Power button: immediate poweroff' not in text:
@@ -73,4 +89,8 @@ def test():
                     proc.kill(); proc.wait()
 
 
-if __name__ == '__main__': test()
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--screenshot', type=Path)
+    test(parser.parse_args().screenshot)

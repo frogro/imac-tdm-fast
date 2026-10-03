@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-MODULES = 'part_gpt part_msdos fat search search_label normal configfile linux boot echo sleep'
+MODULES = 'part_gpt part_msdos fat search search_label normal configfile linux boot echo sleep efi_gop video video_fb gfxterm gfxterm_background font png test'
 
 
 def entry(name, data, mode, inode, major=0, minor=0):
@@ -43,6 +43,7 @@ def build():
                     ('dev/null', b'', stat.S_IFCHR | 0o666, 1, 3)]
         for name in ('init', 'smc'):
             records.append((name, (work/name).read_bytes(), stat.S_IFREG | 0o755, 0, 0))
+        records.append(('splash.gray', (ROOT/'assets/apple.gray').read_bytes(), stat.S_IFREG | 0o644, 0, 0))
         records.append(('TRAILER!!!', b'', 0, 0, 0))
         payload = b''.join(entry(n, d, m, i, a, b) for i, (n,d,m,a,b) in enumerate(records, 1))
         payload += b'\0' * (-len(payload) % 512)
@@ -51,8 +52,9 @@ def build():
         embedded.write_text('search --no-floppy --label TDMFAST --set=root\nconfigfile /grub.cfg\n')
         subprocess.run(['grub-mkstandalone', '-O', 'x86_64-efi', '--locales=', '--fonts=',
             '--install-modules='+MODULES, '--modules='+MODULES,
-            '-o', str(ROOT/'EFI/BOOT/BOOTX64.EFI'), 'boot/grub/grub.cfg='+str(embedded)], check=True, env=env)
-    names = ['EFI/BOOT/BOOTX64.EFI', 'boot/vmlinuz', 'boot/fast.gz', 'grub.cfg']
+            '-o', str(ROOT/'EFI/BOOT/BOOTX64.EFI'), 'boot/grub/grub.cfg='+str(embedded),
+            'boot/grub/fonts/ascii.pf2=/usr/share/grub/ascii.pf2'], check=True, env=env)
+    names = ['EFI/BOOT/BOOTX64.EFI', 'boot/vmlinuz', 'boot/fast.gz', 'boot/splash.png', 'grub.cfg']
     files = []
     for name in names:
         data = (ROOT/name).read_bytes()

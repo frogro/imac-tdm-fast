@@ -17,7 +17,7 @@ spec.loader.exec_module(installer)
 
 class PayloadTests(unittest.TestCase):
     def test_manifest_and_static_initramfs(self):
-        self.assertEqual(len(installer.payload_files()), 4)
+        self.assertEqual(len(installer.payload_files()), 5)
         archive = gzip.decompress((ROOT/'boot/fast.gz').read_bytes())
         pos = 0
         files = {}
@@ -31,7 +31,7 @@ class PayloadTests(unittest.TestCase):
             pos = (pos+size+3)&~3
             if name == 'TRAILER!!!': break
             files[name] = data
-        self.assertEqual(set(files), {'dev', 'proc', 'sys', 'dev/console', 'dev/null', 'init', 'smc'})
+        self.assertEqual(set(files), {'dev', 'proc', 'sys', 'dev/console', 'dev/null', 'init', 'smc', 'splash.gray'})
         with tempfile.TemporaryDirectory() as tmp:
             for name in ('init', 'smc'):
                 path = Path(tmp)/name; path.write_bytes(files[name])
@@ -67,9 +67,9 @@ class PayloadTests(unittest.TestCase):
             return manifest if name=='install-manifest.json' else (ROOT/name).read_bytes()
         with tempfile.TemporaryDirectory() as tmp, patch.object(installer,'fetch',side_effect=fetch):
             files=installer.download_payload(Path(tmp),'main')
-            self.assertEqual(len(files),4)
+            self.assertEqual(len(files),5)
             self.assertEqual((Path(tmp)/'SOURCE-COMMIT.txt').read_text().strip(),commit)
-        self.assertEqual(len(urls),6)
+        self.assertEqual(len(urls),7)
 
     def test_no_menu_or_boot_wait_and_grub_syntax(self):
         cfg=(ROOT/'grub.cfg').read_text()

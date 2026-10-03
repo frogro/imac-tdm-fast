@@ -56,3 +56,16 @@ Druck fordert es `RB_POWER_OFF` an. Eine schon beim Erkennen gehaltene Taste wir
 erst nach dem Loslassen wieder scharf geschaltet. Keine Shutdown-Dienste oder
 Dateisystemsicherung sind nötig, weil das System keine persistenten Daten schreibt.
 Langes Gedrückthalten ist die hardwareseitige Funktion und braucht kein Programm.
+
+## Statische Startgrafik
+
+GRUB schaltet in den Grafikmodus und lädt `boot/splash.png`. Linux verwendet
+`gfxpayload=keep`, eine serielle Konsole und `fbcon=map:1`; normale Meldungen werden
+nicht auf den Bildschirm geschrieben. Da der Kernel den Framebuffer trotzdem
+löschen kann, zeichnet `/init` das Logo über `/dev/fb0` erneut. Fehlt ein
+unterstützter Framebuffer, läuft der TDM-Start ohne Grafik weiter.
+
+Der QEMU-Test liest nach dem Kernelstart den vollständigen Bildschirm zurück und
+vergleicht jedes RGB-Pixel mit dem erwarteten zentrierten Logo auf Schwarz. Danach
+prüft er wie bisher die ACPI-Power-Taste. Mit `--screenshot /pfad/bild.png` wird
+zusätzlich ein PNG der laufenden VM gespeichert.

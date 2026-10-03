@@ -3,8 +3,8 @@
   "files": [
     {
       "path": "EFI/BOOT/BOOTX64.EFI",
-      "size": 1265664,
-      "sha256": "cf507c21fe7134fd30f9b965561409dd4ecf13b3042da3ea8363cdecb8202b03"
+      "size": 1515520,
+      "sha256": "dbacc9d23d3eac3ce735b664f41596ac044484488ae1efe6f40cb8d99d2bd0a5"
     },
     {
       "path": "boot/vmlinuz",
@@ -13,13 +13,18 @@
     },
     {
       "path": "boot/fast.gz",
-      "size": 50680,
-      "sha256": "35bfeddbe698043bfb1f165d361e68b6ec5ef1e671bd9169c532bea95d84cf30"
+      "size": 53238,
+      "sha256": "f4d66799b5f533a56df5f0029ddc0327f71d142c5ff0a53441f682ba2cfa4e34"
+    },
+    {
+      "path": "boot/splash.png",
+      "size": 15725,
+      "sha256": "cfd5bc76d1175a24d0fd9e0cbb64c4affa2f1c80443d7880c4138fd8d3283fb8"
     },
     {
       "path": "grub.cfg",
-      "size": 300,
-      "sha256": "3a80ed1f5ab083a4c06863714bb789c43fa31d912bfb0bd1cb948e6bb0698953"
+      "size": 669,
+      "sha256": "8e98dc144c89b21522dfd0d20ef365b5bc61c085e8ace903c953a77ea9df384c"
     }
   ]
 }
