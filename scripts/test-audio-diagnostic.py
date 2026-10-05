@@ -27,8 +27,10 @@ with tempfile.TemporaryDirectory(prefix='tdm-audio-vm-') as tmp:
  log=(w/'serial.log').read_text(errors='replace')
  assert p.returncode==0 and 'AUDIO_DIAGNOSTIC_COMPLETE' in log,log
  assert hashlib.sha256(internal.read_bytes()).hexdigest()==before
- for name in ('before.txt','after.txt','final.txt','COMPLETE.txt'):
+ for name in ('before.txt','after.txt','final.txt','COMPLETE.txt','route-test.txt'):
   subprocess.run(['mcopy','-i',str(disk)+'@@1048576','::/audio-diag-1/'+name,str(w/name)],check=True)
  report=(w/'after.txt').read_text()
  assert 'HDA Intel' in report and 'Codec:' in report and 'Capture' in report,report
+ route=(w/'route-test.txt').read_text()
+ assert 'LOCAL_SPEAKER_TEST_RESULT=0' in route and 'CAPTURE_RESULT=0' in route and 'LOOP_RESULT=0' in route,route
  print('PASS: USB reports persisted, HDA codec/capture inventoried, internal disk unchanged, automatic poweroff')

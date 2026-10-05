@@ -72,9 +72,10 @@ if [ "$test" != yes ]; then
  sleep 10
 fi
 report AFTER_TDM > "$out/after.txt" 2>&1
-if [ "$test" != yes ]; then sleep 20; fi
+timeout 85 /audio-route-test.sh "$out" "$test"
+echo "ROUTE_SCRIPT_RESULT=$?" > "$out/route-status.txt"
 report FINAL > "$out/final.txt" 2>&1
-echo 'DIAG_COMPLETE: Inventur, keine Aufnahme, keine Audio-Mux-Schreibzugriffe.' > "$out/COMPLETE.txt"
+echo 'DIAG_COMPLETE: Digitaler Audiotest abgeschlossen; keine Audio-Mux-Schreibzugriffe.' > "$out/COMPLETE.txt"
 sync
 umount /source || fail 'USB konnte nicht ausgehaengt werden'
 echo 'AUDIO_DIAGNOSTIC_COMPLETE'
