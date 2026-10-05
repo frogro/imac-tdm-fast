@@ -79,7 +79,7 @@ int main(int argc,char **argv) {
     FILE *log=fopen("/run/audio.txt","w");
     if(log){fflush(stdout);dup2(fileno(log),STDOUT_FILENO);fclose(log);}
     setvbuf(stdout,NULL,_IOLBF,0);
-    puts("audio: experimental HDA speaker setup; DisplayPort audio not verified");
+    puts("audio: HDA speaker setup; digital routing follows in audio-start");
     const char *mods[]={"soundcore","snd","snd-timer","snd-pcm","snd-hwdep",
         "snd-hda-core","snd-hda-codec","snd-hda-codec-generic","snd-hda-codec-cirrus",
         "snd-hda-codec-realtek","snd-intel-dspcfg","snd-hda-intel"};

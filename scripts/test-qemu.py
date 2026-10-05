@@ -49,12 +49,14 @@ def test(screenshot=None):
                     text = log.read_text(errors='replace') if log.exists() else ''
                     if ('Power button ready' in text and 'TEST: SMC hardware access disabled' in text
                         and 'Fan settings unchanged; no GPU modules loaded' in text
-                        and 'audio: setup finished' in text): break
+                        and 'audio: setup finished' in text
+                        and 'audio-loop: started continuous route' in text): break
                     if proc.poll() is not None: raise RuntimeError('QEMU exited: '+(work/'qemu.log').read_text()+text)
                     time.sleep(.2)
                 else: raise RuntimeError('Boot timed out: '+text)
                 for expected_audio in ('audio: snd-hda-intel: loaded', 'audio: card 0', 'audio: set Master Playback Volume='):
                     if expected_audio not in text: raise RuntimeError('Audio test failed: '+text)
+                if text.count('state: RUNNING') < 2: raise RuntimeError('Capture/playback not running: '+text)
                 if ': OK' not in text: raise RuntimeError('No successful mixer write: '+text)
                 print('PASS: HDA device detected and mixer initialized', flush=True)
                 print('EFI/USB boot ready after %.2f s (QEMU/TCG, not iMac timing)' % (time.monotonic()-start), flush=True)

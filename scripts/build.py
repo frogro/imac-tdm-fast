@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
+import shutil
 import stat
 import subprocess
 import tempfile
@@ -52,6 +54,24 @@ def build():
                 raise ValueError('Module checksum mismatch: '+item['file'])
             records.append(('modules/'+item['file'], data, stat.S_IFREG | 0o644, 0, 0))
         records.append(('splash.gray', (ROOT/'assets/apple.gray').read_bytes(), stat.S_IFREG | 0o644, 0, 0))
+        runtime = {}
+        def add_runtime(name, data, mode=0o644):
+            runtime[name] = (data, stat.S_IFREG | mode, 0, 0)
+        if 'statically linked' not in subprocess.check_output(['file','/bin/busybox'],text=True):
+            raise ValueError('busybox-static required')
+        add_runtime('bin/busybox',Path('/bin/busybox').read_bytes(),0o755)
+        for command in ('amixer','alsaloop'):
+            program=Path(shutil.which(command) or '/missing')
+            add_runtime('bin/'+command,program.read_bytes(),0o755)
+            for dep in re.findall(r'(/[^\s()]+)',subprocess.check_output(['ldd',str(program)],text=True)):
+                add_runtime(dep.lstrip('/'),Path(dep).read_bytes(),0o755)
+        for p in Path('/usr/share/alsa').rglob('*'):
+            if p.is_file():add_runtime(str(p).lstrip('/'),p.read_bytes())
+        add_runtime('audio-start.sh',(ROOT/'src/audio-start.sh').read_bytes(),0o755)
+        known={r[0] for r in records}
+        directories={str(p) for n in runtime for p in Path(n).parents if str(p)!='.'} - known
+        records += [(n,b'',stat.S_IFDIR|0o755,0,0) for n in sorted(directories,key=lambda n:(n.count('/'),n))]
+        records += [(n,*v) for n,v in sorted(runtime.items())]
         records.append(('TRAILER!!!', b'', 0, 0, 0))
         payload = b''.join(entry(n, d, m, i, a, b) for i, (n,d,m,a,b) in enumerate(records, 1))
         payload += b'\0' * (-len(payload) % 512)

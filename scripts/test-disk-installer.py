@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test the internal installer using disposable QEMU disks only."""
 import argparse
+import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -86,6 +88,25 @@ def main(payload):
         fresh=usb_image(w,payload,'fresh-usb')
         boot(w,target,fresh,'existing-install','TDM Fast ist bereits installiert.')
         run('qemu-img','compare',str(reference),str(target))
+        # Build a different valid payload to exercise updating an existing install.
+        variant=w/'variant';variant.mkdir()
+        manifest=json.loads((ROOT/'install-manifest.json').read_text())
+        for item in manifest['files']:
+            dest=variant/item['path'];dest.parent.mkdir(parents=True,exist_ok=True)
+            data=(ROOT/item['path']).read_bytes()
+            if item['path']=='grub.cfg': data+=b'\n# update regression fixture\n'
+            dest.write_bytes(data);item['size']=len(data);item['sha256']=hashlib.sha256(data).hexdigest()
+        (variant/'install-manifest.json').write_text(json.dumps(manifest))
+        spec=importlib.util.spec_from_file_location('installer_builder',ROOT/'scripts/build-disk-installer.py')
+        builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
+        newer=w/'newer';builder.build(newer,variant)
+        update_usb=usb_image(w,newer,'update-usb')
+        boot(w,target,update_usb,'update-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.')
+        assert 'Partitionierung bleibt erhalten' in (w/'update-install.log').read_text()
+        latest=usb_image(w,newer,'latest-usb')
+        updated_reference=w/'updated-reference.qcow2';shutil.copyfile(target,updated_reference)
+        boot(w,target,latest,'updated-noop','Aktuelle Version; keine Aenderung.')
+        run('qemu-img','compare',str(updated_reference),str(target))
         # Normal QEMU DMI avoids raw SMC I/O; installed files remain unchanged.
         boot(w,target,None,'internal-boot','Power button ready',internal=True)
         print('PASS: all installer checks; only temporary virtual disks used',flush=True)

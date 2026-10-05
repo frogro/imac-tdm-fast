@@ -16,7 +16,7 @@ spec = importlib.util.spec_from_file_location('payload_build', ROOT/'scripts/bui
 b = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(b)
 
-def build(destination):
+def build(destination, payload_root=ROOT):
     destination.mkdir(parents=True, exist_ok=False)
     files = {}
     def add(path, data, mode=0o644):
@@ -32,10 +32,10 @@ def build(destination):
         for dep in re.findall(r'(/[^\s()]+)', deps):
             path = Path(dep)
             add(dep.lstrip('/'), path.read_bytes(), 0o755)
-    manifest = json.loads((ROOT/'install-manifest.json').read_text())
+    manifest = json.loads((payload_root/'install-manifest.json').read_text())
     checksums = []
     for item in manifest['files']:
-        data = (ROOT/item['path']).read_bytes()
+        data = (payload_root/item['path']).read_bytes()
         if hashlib.sha256(data).hexdigest() != item['sha256'] or len(data) != item['size']:
             raise ValueError('Invalid payload: '+item['path'])
         add('payload/'+item['path'], data)

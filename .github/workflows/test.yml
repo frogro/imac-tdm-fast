@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y musl-tools linux-libc-dev binutils grub-efi-amd64-bin grub-common qemu-system-x86 ovmf dosfstools mtools fdisk
+      - run: sudo apt-get update && sudo apt-get install -y musl-tools linux-libc-dev binutils grub-efi-amd64-bin grub-common qemu-system-x86 ovmf dosfstools mtools fdisk busybox-static alsa-utils file
       - name: Check shipped payload
         run: python3 -m unittest discover -s tests -v
       - name: Boot shipped EFI and power off

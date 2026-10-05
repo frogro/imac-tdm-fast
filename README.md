@@ -33,7 +33,7 @@ Der iMac wird ausgeschaltet, bleibt am Stromnetz aber im Standby.
 Beim Start erscheint ein weißes Apple-Logo auf schwarzem Hintergrund, ohne Menü,
 Text, Animation oder zusätzliche Wartezeit. Das RAM-System zeichnet das Logo
 nach dem Kernelstart erneut; anschließend übernimmt das externe TDM-Bild.
-Die Darstellung wurde in QEMU geprüft und muss am iMac noch bestätigt werden.
+Die Darstellung wurde in QEMU geprüft und am iMac bestätigt.
 Sehr frühe Anzeigen der Mac-Firmware oder des EFI-Laders liegen davor und können
 kurz sichtbar bleiben. Das Projekt ist kein Apple-Produkt.
 
@@ -55,28 +55,20 @@ können vom tatsächlichen Monitorbetrieb abweichen.
 Im normalen Betrieb bleiben die Messwerte auf der seriellen Konsole und in
 `/run/health.txt` im RAM; es gibt keinen SSH-Zugang und keine Speicherung auf dem Stick.
 
-## Ton: experimentelle Unterstützung
+## Ton über DisplayPort
 
-Nach der Bildumschaltung werden HDA-Soundtreiber geladen. Vorhandene Master- und
-Lautsprecherregler werden aktiviert und auf 40 % ihres Reglerbereichs gesetzt.
-Dies läuft im Hintergrund und wartet nicht vor der TDM-Umschaltung.
-Es werden weiterhin keine Grafiktreiber geladen.
+Bild und Ton wurden am **iMac11,1 (27″, Ende 2009) mit Cirrus CS4206** bestätigt:
+Testtöne und YouTube vom angeschlossenen Mini-PC sind über die iMac-Lautsprecher hörbar.
+Nach der Bildumschaltung startet automatisch die Weiterleitung des digitalen
+Audioeingangs auf die Lautsprecher. Die Lautstärke lässt sich an der Bildquelle regeln.
+Für andere iMac-Modelle ist diese Tonweiterleitung noch nicht freigeschaltet.
 
-**DisplayPort-Ton ist am iMac noch nicht bestätigt.** Diese Testfassung prüft,
-ob die normale Initialisierung des Audiochips genügt. Sie implementiert keine
-nachgewiesene zusätzliche DisplayPort-Audioumschaltung. Auch im
-[ursprünglichen SMC-Projekt](https://github.com/floe/smc_util/issues/6) ist Ton
-unter Linux eine offene Frage. Ein stummes Ergebnis bedeutet daher nicht,
-dass Lautsprecher oder Kabel defekt sind.
+Die Weiterleitung läuft dauerhaft im RAM, ohne Grafiktreiber, Testtöne oder
+zeitgesteuertes Ausschalten. Falls der Audioprozess endet, wird er erneut gestartet.
+Die Initialisierung läuft im Hintergrund und verzögert die Bildumschaltung nicht.
 
-Die Treiber- und Mixerdiagnose liegt nur im RAM unter `/run/audio.txt`.
-Für diesen Test den normalen USB-Installer verwenden: Er erstellt ein direkt
-bootendes RAM-System und installiert beim Start **nichts auf die interne Platte**.
-Am iMac mit Alt/Option ausdrücklich den USB-Stick wählen, falls intern bereits
-TDM Fast installiert ist. Danach Ton auf der angeschlossenen Bildquelle abspielen.
-
-Die separate [USB-Audiodiagnose](docs/audio-diagnostic.md) speichert Hardwareberichte
-auf dem ausgewaehlten Stick und schaltet den iMac danach automatisch aus.
+Die separate [USB-Audiodiagnose](docs/audio-diagnostic.md) ist nur für Fehlersuche
+bestimmt; sie erzeugt Testtöne und schaltet danach automatisch aus.
 
 ## Was ist schneller?
 
@@ -86,7 +78,7 @@ startet ein kleines RAM-Programm direkt als `/init`.
 
 Es gibt keine Menüwartezeit, keinen USB-Such-Timer, keine Netzwerkanmeldung,
 keine Paketverwaltung und keine Diagnose vor dem Umschalten. Das vollständige
-Bootpaket ist rund **7,9 MB** groß; das komprimierte RAM-Dateisystem rund **422 KB**.
+Bootpaket ist rund **12,8 MB** groß; das komprimierte RAM-Dateisystem rund **5,3 MB**.
 Die einsekündige Pause zwischen den beiden SMC-Befehlen des funktionierenden
 Originalsticks bleibt vorerst erhalten. Nach dem letzten Befehl folgt keine Pause.
 
@@ -151,7 +143,7 @@ Auf anderen Modellkennungen unterbleiben SMC-Schreibzugriffe. Die Power-Taste wi
 Auf x86_64-Linux, beispielsweise Debian/Ubuntu:
 
 ```bash
-sudo apt install python3 gcc musl-tools linux-libc-dev binutils grub-efi-amd64-bin grub-common
+sudo apt install python3 gcc musl-tools linux-libc-dev binutils grub-efi-amd64-bin grub-common busybox-static alsa-utils file
 python3 scripts/build.py
 python3 -m unittest discover -s tests -v
 ```
@@ -186,4 +178,5 @@ python3 scripts/build.py
 
 Ein separater [einmaliger Installationsstick](docs/internal-installer.md) kann die
 interne Seagate ST31000528AS mit 1 TB loeschen und TDM Fast dort installieren.
-Dieser Sondermodus startet die Installation automatisch und wird separat gebaut.
+Eine vorhandene, markierte TDM-Fast-Installation wird ohne neue Partitionierung
+aktualisiert. Dieser Sondermodus startet automatisch und wird separat gebaut.

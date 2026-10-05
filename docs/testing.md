@@ -86,21 +86,19 @@ Die Sensorüberwachung verändert keine Lüfterwerte und ist kein zusätzlicher
 Überhitzungsschutz. CPU-Frequenz, Temperaturen und Lüfterdrehzahlen müssen noch
 am echten iMac überprüft werden.
 
-## Experimentelle Audioinitialisierung
+## Dauerhafte Audioweiterleitung
 
-Der QEMU-Test enthält eine virtuelle HDA-Soundkarte. Er prüft, dass der HDA-Treiber
-geladen, eine Soundkarte erkannt und ein Mixerregler geschrieben wird. Logo und
-Power-Taste werden anschließend weiterhin geprüft. Dies bestätigt nicht den
-DisplayPort-Audioeingang oder die Lautsprecher des echten iMac.
+Am 5. Oktober 2026 bestätigte der Besitzer lokale Testtöne und YouTube-Ton vom
+DisplayPort-Mini-PC am iMac11,1 / Mac-F2268DAE / Cirrus CS4206 (Subsystem 106b5100).
+Die normale Fassung übernimmt die geprüften Einstellungen: Master −12 dB,
+Speaker/Bass Speaker −6 dB, IEC958 Capture aktiv. `alsaloop` verbindet `hw:0,1`
+mit `plughw:0,0`, Stereo S16_LE/48 kHz, 50 ms Pufferziel und einfacher
+Taktsynchronisation. Die Kartennummer wird anhand des Codecs ermittelt.
+Es gibt keine Mikrofonweiterleitung, Testtöne oder zeitgesteuerte Abschaltung.
+Andere Modelle erhalten keine unbestätigte digitale Audioroute.
 
-`/audio` startet nach den TDM-Befehlen parallel zur Sensorüberwachung. Es lädt
-versionsgebundene ALSA/HDA-Module (Cirrus, Realtek und generischer Codec), aktiviert
-nur benannte Master-/Speaker-Wiedergabeschalter und stellt Master-/Speaker-/PCM-
-Wiedergabelautstärken auf 40 % ihres numerischen Bereichs. Das ist keine
-kalibrierte akustische Lautstärke. Capture-, Kopfhörer-, Routing- und unbekannte
-Regler bleiben unverändert. Es sendet keine undokumentierten Codec-Verben oder
-zusätzlichen SMC-Befehle. HDA-Stromsparen bleibt für den Test ausgeschaltet.
-
-Das Testsystem bindet keine Datenträger ein und enthält keinen Platteninstaller.
-Audio-Logs in `/run/audio.txt` verschwinden beim Ausschalten. Der Codec und eine
-möglicherweise zusätzlich notwendige TDM-Audioroute müssen am iMac geprüft werden.
+QEMU prüft beide PCM-Richtungen im Zustand RUNNING, die Initialisierung,
+das unveränderte Logo und Ausschalten per ACPI-Taste. Der virtuelle Test ersetzt
+nicht den Hardwarebeleg. Langzeitbetrieb und weitere Signalquellen sind damit
+nicht umfassend getestet. ALSA-Prozesse laufen parallel zur Sensorüberwachung;
+Datenträger bleiben im normalen TDM-Betrieb ungemountet.

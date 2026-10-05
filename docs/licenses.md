@@ -48,3 +48,14 @@ mit der veröffentlichten TinyCore-Prüfsumme verglichen, zusätzlich werden Arc
 und einzelne Module per SHA-256 festgehalten.
 Die zugehörigen GPL-Kernelquellen und die Konfiguration sind im oben verlinkten
 Quellen-Release enthalten.
+
+## Audiolaufzeit
+
+BusyBox (GPL-2.0), ALSA-utils (GPL-2.0), ALSA-lib und glibc (überwiegend LGPL)
+sowie libsamplerate (BSD-2-Clause) werden aus den Ubuntu-Paketen übernommen.
+Die vollständigen Lizenzhinweise stehen unter `licenses/`; die Paketversionen
+des ausgelieferten Images stehen in `vendor/audio-runtime.json`.
+Passende Originalquellen und Distributionspatches stehen ebenfalls im oben
+verlinkten Quellen-Release und in `source-archives.json`. Die Bibliotheken
+bleiben dynamisch eingebunden; der Builder kann mit geänderten Bibliotheken
+ein neues Image erzeugen. Es gibt keine Signaturprüfung, die solche Änderungen sperrt.

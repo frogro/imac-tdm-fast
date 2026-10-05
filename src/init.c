@@ -213,8 +213,8 @@ int main(void) {
         else if (start_tdm(test)) logmsg("TDM startup failed; continuing with CPU/sensor setup");
         pid_t audio = fork();
         if (audio == 0) {
-            if (test) execl("/audio", "audio", "--test", (char *)NULL);
-            else execl("/audio", "audio", (char *)NULL);
+            if (test) execl("/bin/busybox", "busybox", "sh", "/audio-start.sh", "--test", (char *)NULL);
+            else execl("/bin/busybox", "busybox", "sh", "/audio-start.sh", (char *)NULL);
             _exit(127);
         }
         /* SMC direct-I/O helper has exited before applesmc can claim its ports. */

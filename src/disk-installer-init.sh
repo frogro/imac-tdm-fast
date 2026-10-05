@@ -59,20 +59,29 @@ done
 [ -n "$target" ] || fail 'Interne ST31000528AS mit 1 TB nicht gefunden'
 source_parent=$(basename "$(dirname "$(readlink -f /sys/class/block/${source_device##*/})")")
 [ "$target" != "/dev/$source_parent" ] || fail 'Quelle und Ziel sind identisch'
-# Refuse repeat installations on an already installed internal disk, even with a fresh USB.
+# A marked installation can be updated without repartitioning.
+installed_partition=
 for partition in /sys/class/block/${target##*/}[0-9]*; do
     [ -e "$partition/partition" ] || continue
     if mount -t vfat -o ro,nosuid,nodev,noexec "/dev/${partition##*/}" /target 2>/dev/null; then
         if [ -e /target/TDM_FAST_INSTALLED ]; then
-            umount /target || fail 'Ziel aushaengen'
-            umount /source || fail 'USB aushaengen'
-            finish 'TDM Fast ist bereits installiert. Keine erneute Loeschung.'
+            [ -z "$installed_partition" ] || fail 'Mehrere markierte Installationen'
+            if (cd /target && sha256sum -c /payload/SHA256SUMS) >/dev/null 2>&1; then
+                umount /target || fail 'Ziel aushaengen'
+                umount /source || fail 'USB aushaengen'
+                finish 'TDM Fast ist bereits installiert. Aktuelle Version; keine Aenderung.'
+            fi
+            installed_partition=/dev/${partition##*/}
         fi
         umount /target || fail 'Ziel aushaengen'
     fi
 done
 echo "Ziel: $target - Seagate ST31000528AS, 1 TB"
-echo 'ALLE BISHERIGEN PARTITIONEN UND DATEISYSTEME AUF DIESEM LAUFWERK WERDEN ENTFERNT.'
+if [ -n "$installed_partition" ]; then
+    echo 'Vorhandenes TDM Fast wird aktualisiert. Partitionierung bleibt erhalten.'
+else
+    echo 'ALLE BISHERIGEN PARTITIONEN UND DATEISYSTEME AUF DIESEM LAUFWERK WERDEN ENTFERNT.'
+fi
 echo 'Start in 15 Sekunden. Zum Abbrechen jetzt ausschalten (Powerknopf lange halten).'
 sleep 15
 # A durable one-shot latch BEFORE the first internal-disk write. A failed or
@@ -82,6 +91,7 @@ sync
 umount /source || fail 'Startmarker konnte nicht sicher gespeichert werden'
 mount -t vfat -o rw,nosuid,nodev,noexec "$source_device" /source || fail 'USB erneut einbinden'
 [ -s /source/INSTALLATION_STARTED ] || fail 'Startmarker fehlt'
+if [ -z "$installed_partition" ]; then
 # Remove filesystem signatures at former partition starts before replacing GPT.
 for partition in /sys/class/block/${target##*/}[0-9]*; do
     [ -e "$partition/partition" ] || continue
@@ -96,10 +106,13 @@ mdev -s
 partition=${target}1
 [ -b "$partition" ] || fail 'Neue EFI-Partition fehlt'
 mkfs.fat -F 32 -n TDMFAST "$partition" || fail 'EFI-Dateisystem'
+else
+    partition=$installed_partition
+fi
 mount -t vfat -o rw,nosuid,nodev,noexec "$partition" /target || fail 'EFI einbinden'
 cp -R /payload/EFI /payload/boot /payload/grub.cfg /payload/SHA256SUMS /target/ || fail 'Dateien kopieren'
 (cd /target && sha256sum -c SHA256SUMS) || fail 'Pruefsummen'
-echo 'iMac TDM Fast installed by one-shot installer v1' > /target/TDM_FAST_INSTALLED || fail 'Zielmarker'
+echo 'iMac TDM Fast installed by one-shot installer v2' > /target/TDM_FAST_INSTALLED || fail 'Zielmarker'
 sync
 umount /target || fail 'EFI aushaengen'
 # Re-read the files after unmounting to check the installed filesystem.

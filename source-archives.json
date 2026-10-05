@@ -38,5 +38,100 @@
     "file": "musl_1.2.5-3build1.dsc",
     "url": "http://archive.ubuntu.com/ubuntu/pool/universe/m/musl/musl_1.2.5-3build1.dsc",
     "sha256": "2d0342ff83e5560169b69b598bffcde12224fbdc298a9dbb5271602fd656ef46"
+  },
+  {
+    "file": "alsa-lib_1.2.15.3-1ubuntu1.1.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-lib/alsa-lib_1.2.15.3-1ubuntu1.1.debian.tar.xz",
+    "sha256": "a9b44093e5e56979a3f13ca2f33c6002c548af27c46eb7ce0ba9471d1d119bf9"
+  },
+  {
+    "file": "alsa-lib_1.2.15.3-1ubuntu1.1.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-lib/alsa-lib_1.2.15.3-1ubuntu1.1.dsc",
+    "sha256": "cbe523438964969699ca3d94e478d35ae3891566d8349ab2292b141aadba214b"
+  },
+  {
+    "file": "alsa-lib_1.2.15.3.orig.tar.bz2",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-lib/alsa-lib_1.2.15.3.orig.tar.bz2",
+    "sha256": "7b079d614d582cade7ab8db2364e65271d0877a37df8757ac4ac0c8970be861e"
+  },
+  {
+    "file": "alsa-lib_1.2.15.3.orig.tar.bz2.asc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-lib/alsa-lib_1.2.15.3.orig.tar.bz2.asc",
+    "sha256": "742748632601a85e3a6d4b68b07a04354d93e868aeedae5ec71fc6f17d1bc6fe"
+  },
+  {
+    "file": "alsa-utils_1.2.15.2-1ubuntu1.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-utils/alsa-utils_1.2.15.2-1ubuntu1.debian.tar.xz",
+    "sha256": "4d45a44925d59dee4041d57932de09cf93f14b6ad75364558c1bc10b1e21ad81"
+  },
+  {
+    "file": "alsa-utils_1.2.15.2-1ubuntu1.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-utils/alsa-utils_1.2.15.2-1ubuntu1.dsc",
+    "sha256": "fe945018eb1d526c5b4f245a80d018732dbba668b781bff759527ad4ba413f1b"
+  },
+  {
+    "file": "alsa-utils_1.2.15.2.orig.tar.bz2",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-utils/alsa-utils_1.2.15.2.orig.tar.bz2",
+    "sha256": "7aaaafbfb01942113ec0c31e51f705910e81079205088ca2f8f137a3869e1a3a"
+  },
+  {
+    "file": "alsa-utils_1.2.15.2.orig.tar.bz2.asc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/a/alsa-utils/alsa-utils_1.2.15.2.orig.tar.bz2.asc",
+    "sha256": "e5257406f1bf8785b8716e452fdac1a4a246cebef523d27f83e0b9a3fb9eef7d"
+  },
+  {
+    "file": "busybox_1.37.0-7ubuntu1.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/b/busybox/busybox_1.37.0-7ubuntu1.debian.tar.xz",
+    "sha256": "5b97c2c2e4f259cccb57f5613d7261e8a0e2b94c4c3e55e2a907bb4cc1186915"
+  },
+  {
+    "file": "busybox_1.37.0-7ubuntu1.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/b/busybox/busybox_1.37.0-7ubuntu1.dsc",
+    "sha256": "125ebeae728a614d5c93687307d342037baade55599c10bc8c2e927e70d1ffab"
+  },
+  {
+    "file": "busybox_1.37.0.orig.tar.bz2",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/b/busybox/busybox_1.37.0.orig.tar.bz2",
+    "sha256": "3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4"
+  },
+  {
+    "file": "busybox_1.37.0.orig.tar.bz2.asc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/b/busybox/busybox_1.37.0.orig.tar.bz2.asc",
+    "sha256": "771f2b06609b670e9c7f864832ece85a661dc7e5e6505a8e82436940fea5c7f8"
+  },
+  {
+    "file": "glibc_2.43-2ubuntu2.4.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.43-2ubuntu2.4.debian.tar.xz",
+    "sha256": "28103a7cf808c29901c6053d89a4e8299880abfbb850c0d97a09c8df8533e306"
+  },
+  {
+    "file": "glibc_2.43-2ubuntu2.4.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.43-2ubuntu2.4.dsc",
+    "sha256": "da10d551ca51076bf7bf663de38369d04e267386b8211c283c2814e68e482ed3"
+  },
+  {
+    "file": "glibc_2.43.orig.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.43.orig.tar.xz",
+    "sha256": "d9c86c6b5dbddb43a3e08270c5844fc5177d19442cf5b8df4be7c07cd5fa3831"
+  },
+  {
+    "file": "glibc_2.43.orig.tar.xz.asc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.43.orig.tar.xz.asc",
+    "sha256": "0a725eb20ceb526abf52d3129f03e0399afa0d97ffa1dd779bed42958ab23326"
+  },
+  {
+    "file": "libsamplerate_0.2.2-4build2.debian.tar.xz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/libs/libsamplerate/libsamplerate_0.2.2-4build2.debian.tar.xz",
+    "sha256": "2fa53060df381009d7a80ce582d367709694ea7e19d2c54d90dae9c47b599517"
+  },
+  {
+    "file": "libsamplerate_0.2.2-4build2.dsc",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/libs/libsamplerate/libsamplerate_0.2.2-4build2.dsc",
+    "sha256": "b57ce46ab71f00187977de293b2f0b70419a76e5b6f494c4bc3106c9d64ee54e"
+  },
+  {
+    "file": "libsamplerate_0.2.2.orig.tar.gz",
+    "url": "http://archive.ubuntu.com/ubuntu/pool/main/libs/libsamplerate/libsamplerate_0.2.2.orig.tar.gz",
+    "sha256": "16e881487f184250deb4fcb60432d7556ab12cb58caea71ef23960aec6c0405a"
   }
 ]

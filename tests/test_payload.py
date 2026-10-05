@@ -32,9 +32,13 @@ class PayloadTests(unittest.TestCase):
             if name == 'TRAILER!!!': break
             files[name] = data
         modules = json.loads((ROOT/'vendor/modules/manifest.json').read_text())
-        self.assertEqual(set(files), {'dev', 'proc', 'sys', 'dev/console', 'dev/null',
+        self.assertTrue(( {'dev', 'proc', 'sys', 'dev/console', 'dev/null',
             'init', 'smc', 'audio', 'splash.gray', 'health', 'modules', 'run'} |
-            {'modules/'+item['file'] for item in modules['files']})
+            {'modules/'+item['file'] for item in modules['files']}) <= set(files))
+        for name in ('bin/busybox','bin/amixer','bin/alsaloop','audio-start.sh','usr/share/alsa/alsa.conf'):
+            self.assertIn(name, files)
+        self.assertNotIn('speaker-test.wav',files)
+        self.assertNotIn('audio-route-test.sh',files)
         with tempfile.TemporaryDirectory() as tmp:
             for name in ('init', 'smc', 'health', 'audio'):
                 path = Path(tmp)/name; path.write_bytes(files[name])

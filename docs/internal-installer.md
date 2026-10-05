@@ -1,14 +1,15 @@
 # Einmaliger Installer fuer die interne iMac-Platte
 
 Dieser Modus ist ausschliesslich fuer den freigegebenen iMac mit interner
-**Seagate ST31000528AS, 1 TB, SATA** bestimmt. Er entfernt beim Start automatisch
-alle bisherigen Partitionen auf dieser Platte. **Keine Datensicherung ist enthalten.**
+**Seagate ST31000528AS, 1 TB, SATA** bestimmt. Bei einer Erstinstallation entfernt er automatisch
+alle bisherigen Partitionen auf dieser Platte. Eine bereits mit `TDM_FAST_INSTALLED`
+markierte Installation erhält stattdessen nur die neuen Bootdateien einschließlich Tonweiterleitung. **Keine Datensicherung ist enthalten.**
 Andere Modelle, USB-Ziellaufwerke und mehrere passende Platten werden abgelehnt.
 Die Modellkennung des iMac muss `iMac10,1` oder `iMac11,1` sein; unterstuetzt ist
 nur der 27-Zoll-iMac von Ende 2009.
 
 Der Stick zeigt das Ziel an und wartet 15 Sekunden. In dieser Zeit kann man durch
-langes Druecken des Powerknopfs ausschalten. Danach legt er eine GPT mit einer
+langes Druecken des Powerknopfs ausschalten. Bei einer Erstinstallation legt er eine GPT mit einer
 512-MiB-FAT32-EFI-Partition an und installiert die normale TDM-Fast-Fassung.
 Der Rest der Platte bleibt unpartitioniert. Partitionstabellen und alte
 Dateisystemsignaturen werden entfernt; dies ist **keine sichere Vollueberschreibung**
@@ -26,10 +27,30 @@ auf dem USB-Stick geschrieben, ausgehangen, erneut eingebunden und kontrolliert.
 Ist dieser Marker bei einem spaeteren Start vorhanden, wird nichts mehr geloescht.
 Das gilt auch nach einer fehlgeschlagenen oder unterbrochenen Installation.
 Ein frischer Installationsstick erkennt ausserdem `TDM_FAST_INSTALLED` auf der
-internen EFI-Partition und verweigert eine erneute Installation.
+internen EFI-Partition: Stimmen die Bootdateien mit der neuen Version überein,
+ändert er nichts. Andernfalls aktualisiert er diese Partition nach der Wartezeit
+und prüft die neuen Dateien. Auch Updates sind durch den USB-Einmalmarker geschützt.
 
 Zum bewussten Wiederholen nach einem Fehler muss der Stick neu vorbereitet werden.
 Die Fehlermeldung vorher klaeren; Marker nicht einfach unbeaufsichtigt entfernen.
+
+## Fertiges Installationspaket
+
+Das geprüfte Paket mit Audioweiterleitung steht im
+[Release v0.2.0-audio](https://github.com/frogro/imac-tdm-fast/releases/tag/v0.2.0-audio).
+`imac-tdm-fast-hdd-installer.tar.gz` herunterladen und entpacken. Im enthaltenen
+Verzeichnis liegt auch `install-usb.py`; damit den gewünschten USB-Stick schreiben:
+
+```sh
+sudo apt install python3 dosfstools parted util-linux udev
+cd imac-tdm-fast-hdd-installer
+sudo python3 install-usb.py --source . --device /dev/sdX
+sudo fatlabel /dev/sdX1 TDMSETUP
+```
+
+`/dev/sdX` unbedingt durch den richtigen USB-Stick ersetzen. Danach am iMac mit
+Alt/Option vom USB-Stick starten. Die Installation beziehungsweise Aktualisierung
+beginnt nach 15 Sekunden automatisch und endet mit dem Ausschalten.
 
 ## Erzeugen unter Linux
 
@@ -68,7 +89,7 @@ jeweiligen Paketlizenzen. Der Builder installiert nichts auf dem Build-System.
 Der QEMU-Test verwendet ausschliesslich temporaere Images, eine virtuelle
 1-TB-SATA-Platte und eine simulierte iMac-DMI-Kennung. Er prueft die Ablehnung
 eines falschen Plattenmodells, Installation, Einmalsperre, Erkennung einer bereits
-installierten Platte und anschliessenden Start von der internen Platte ohne USB.
+installierten Platte, Aktualisierung mit verändertem Payload und anschliessenden Start von der internen Platte ohne USB.
 Bei diesem letzten Test gilt wieder die normale QEMU-DMI-Kennung, damit keine
 SMC-Umschaltbefehle ausgefuehrt werden. Die reale Displayumschaltung und die
 Startlaufwerksauswahl des iMac lassen sich damit nicht nachweisen.
