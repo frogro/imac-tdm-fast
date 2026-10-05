@@ -75,6 +75,9 @@ bootendes RAM-System und installiert beim Start **nichts auf die interne Platte*
 Am iMac mit Alt/Option ausdrücklich den USB-Stick wählen, falls intern bereits
 TDM Fast installiert ist. Danach Ton auf der angeschlossenen Bildquelle abspielen.
 
+Die separate [USB-Audiodiagnose](docs/audio-diagnostic.md) speichert Hardwareberichte
+auf dem ausgewaehlten Stick und schaltet den iMac danach automatisch aus.
+
 ## Was ist schneller?
 
 Das Projekt basiert auf [tinycore-tdm](https://github.com/frogro/tinycore-tdm),
