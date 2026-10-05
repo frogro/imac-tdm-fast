@@ -33,7 +33,7 @@ def build():
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
         env = dict(os.environ, SOURCE_DATE_EPOCH='0')
-        for name, source in [('init', 'src/init.c'), ('smc', 'src/smc/SmcDumpKey.c'), ('health', 'src/health.c')]:
+        for name, source in [('init', 'src/init.c'), ('smc', 'src/smc/SmcDumpKey.c'), ('health', 'src/health.c'), ('audio', 'src/audio.c')]:
             subprocess.run(['musl-gcc', '-idirafter', '/usr/include', '-idirafter', '/usr/include/x86_64-linux-gnu', '-static', '-Os', '-s', '-Wall', '-Wextra', '-Werror',
                 '-fno-ident', '-Wl,--build-id=none', '-o', str(work/name), str(ROOT/source)], check=True, env=env)
         records = []
@@ -41,7 +41,7 @@ def build():
             records.append((name, b'', stat.S_IFDIR | 0o755, 0, 0))
         records += [('dev/console', b'', stat.S_IFCHR | 0o600, 5, 1),
                     ('dev/null', b'', stat.S_IFCHR | 0o666, 1, 3)]
-        for name in ('init', 'smc', 'health'):
+        for name in ('init', 'smc', 'health', 'audio'):
             records.append((name, (work/name).read_bytes(), stat.S_IFREG | 0o755, 0, 0))
         modules = json.loads((ROOT/'vendor/modules/manifest.json').read_text())
         if modules['kernel'] != provenance['kernel_version']:

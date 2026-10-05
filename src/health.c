@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/utsname.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -170,6 +171,7 @@ int main(int argc, char **argv) {
     configure_cpu();
     mkdir("/run",0700);
     for (;;) {
+        while (waitpid(-1,NULL,WNOHANG)>0) {}
         if (diagnostic) fputs("\033[2J\033[H",stdout);
         snapshot(stdout);
         FILE *out=fopen("/run/health.new","w");

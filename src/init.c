@@ -211,6 +211,12 @@ int main(void) {
     if (worker == 0) {
         if (diagnostic) logmsg("DIAGNOSTICS: display stays internal; TDM commands skipped");
         else if (start_tdm(test)) logmsg("TDM startup failed; continuing with CPU/sensor setup");
+        pid_t audio = fork();
+        if (audio == 0) {
+            if (test) execl("/audio", "audio", "--test", (char *)NULL);
+            else execl("/audio", "audio", (char *)NULL);
+            _exit(127);
+        }
         /* SMC direct-I/O helper has exited before applesmc can claim its ports. */
         if (test) execl("/health", "health", "--test", (char *)NULL);
         else if (diagnostic) execl("/health", "health", "--diagnostics", (char *)NULL);

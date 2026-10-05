@@ -60,7 +60,8 @@ class HealthTests(unittest.TestCase):
         manifest=json.loads((ROOT/'vendor/modules/manifest.json').read_text())
         self.assertEqual(manifest['kernel'],json.loads((ROOT/'sources.json').read_text())['kernel_version'])
         self.assertEqual({i['file'] for i in manifest['files']},
-            {'applesmc.ko','coretemp.ko','acpi-cpufreq.ko','cpufreq_powersave.ko'})
+            {'applesmc.ko','coretemp.ko','acpi-cpufreq.ko','cpufreq_powersave.ko'} |
+            {n+'.ko' for n in 'soundcore snd snd-timer snd-pcm snd-hwdep snd-hda-core snd-hda-codec snd-hda-codec-generic snd-hda-codec-cirrus snd-hda-codec-realtek snd-intel-dspcfg snd-hda-intel'.split()})
         for item in manifest['files']:
             data=(ROOT/'vendor/modules'/item['file']).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(),item['sha256'])

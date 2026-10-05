@@ -55,6 +55,26 @@ können vom tatsächlichen Monitorbetrieb abweichen.
 Im normalen Betrieb bleiben die Messwerte auf der seriellen Konsole und in
 `/run/health.txt` im RAM; es gibt keinen SSH-Zugang und keine Speicherung auf dem Stick.
 
+## Ton: experimentelle Unterstützung
+
+Nach der Bildumschaltung werden HDA-Soundtreiber geladen. Vorhandene Master- und
+Lautsprecherregler werden aktiviert und auf 40 % ihres Reglerbereichs gesetzt.
+Dies läuft im Hintergrund und wartet nicht vor der TDM-Umschaltung.
+Es werden weiterhin keine Grafiktreiber geladen.
+
+**DisplayPort-Ton ist am iMac noch nicht bestätigt.** Diese Testfassung prüft,
+ob die normale Initialisierung des Audiochips genügt. Sie implementiert keine
+nachgewiesene zusätzliche DisplayPort-Audioumschaltung. Auch im
+[ursprünglichen SMC-Projekt](https://github.com/floe/smc_util/issues/6) ist Ton
+unter Linux eine offene Frage. Ein stummes Ergebnis bedeutet daher nicht,
+dass Lautsprecher oder Kabel defekt sind.
+
+Die Treiber- und Mixerdiagnose liegt nur im RAM unter `/run/audio.txt`.
+Für diesen Test den normalen USB-Installer verwenden: Er erstellt ein direkt
+bootendes RAM-System und installiert beim Start **nichts auf die interne Platte**.
+Am iMac mit Alt/Option ausdrücklich den USB-Stick wählen, falls intern bereits
+TDM Fast installiert ist. Danach Ton auf der angeschlossenen Bildquelle abspielen.
+
 ## Was ist schneller?
 
 Das Projekt basiert auf [tinycore-tdm](https://github.com/frogro/tinycore-tdm),
@@ -63,7 +83,7 @@ startet ein kleines RAM-Programm direkt als `/init`.
 
 Es gibt keine Menüwartezeit, keinen USB-Such-Timer, keine Netzwerkanmeldung,
 keine Paketverwaltung und keine Diagnose vor dem Umschalten. Das vollständige
-Bootpaket ist rund **7,5 MB** groß; das RAM-Dateisystem selbst nur rund **98 KB**.
+Bootpaket ist rund **7,9 MB** groß; das komprimierte RAM-Dateisystem rund **422 KB**.
 Die einsekündige Pause zwischen den beiden SMC-Befehlen des funktionierenden
 Originalsticks bleibt vorerst erhalten. Nach dem letzten Befehl folgt keine Pause.
 
@@ -133,7 +153,7 @@ python3 scripts/build.py
 python3 -m unittest discover -s tests -v
 ```
 
-Das baut `/init`, die Sensorüberwachung, das SMC-Programm, `boot/fast.gz`, den EFI-Bootloader und das
+Das baut `/init`, die Audioinitialisierung, die Sensorüberwachung, das SMC-Programm, `boot/fast.gz`, den EFI-Bootloader und das
 Downloadmanifest neu. `boot/vmlinuz` bleibt der per SHA-256 festgelegte Kernel aus
 dem ursprünglichen Repository. Es werden keine Systemdateien des Build-Rechners verändert.
 

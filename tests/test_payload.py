@@ -31,11 +31,12 @@ class PayloadTests(unittest.TestCase):
             pos = (pos+size+3)&~3
             if name == 'TRAILER!!!': break
             files[name] = data
-        self.assertEqual(set(files), {'dev', 'proc', 'sys', 'dev/console', 'dev/null', 'init', 'smc', 'splash.gray', 'health', 'modules', 'run',
-            'modules/acpi-cpufreq.ko', 'modules/cpufreq_powersave.ko',
-            'modules/coretemp.ko', 'modules/applesmc.ko'})
+        modules = json.loads((ROOT/'vendor/modules/manifest.json').read_text())
+        self.assertEqual(set(files), {'dev', 'proc', 'sys', 'dev/console', 'dev/null',
+            'init', 'smc', 'audio', 'splash.gray', 'health', 'modules', 'run'} |
+            {'modules/'+item['file'] for item in modules['files']})
         with tempfile.TemporaryDirectory() as tmp:
-            for name in ('init', 'smc', 'health'):
+            for name in ('init', 'smc', 'health', 'audio'):
                 path = Path(tmp)/name; path.write_bytes(files[name])
                 header = subprocess.check_output(['readelf', '-l', str(path)], text=True)
                 self.assertNotIn('INTERP', header)

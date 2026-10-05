@@ -22,6 +22,78 @@
       "sha256": "70772754f6a7eaa45cadbfaa9fe5e3c62336388b9fea5bb929c3c3d485ec5539",
       "source": "http://tinycorelinux.net/15.x/x86_64/tcz/hwmon-6.6.8-tinycore64.tcz",
       "archive_sha256": "44596320fd65e97de56e9b11334350403a5efecdfc097cfc418c07794587fdf6"
+    },
+    {
+      "file": "soundcore.ko",
+      "sha256": "031a427f951d940d66517630acf46214db8c2ecf9fe8693fbfe446cba401e6c9",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd.ko",
+      "sha256": "3e26dba39cbc1c2d03431860d49ba073d137d5c4a1bc7a6f9cf1c5b11c45a99a",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-timer.ko",
+      "sha256": "0454f75de9063e9e9c27252b3524a357501c7f892626389dd0aee03a567821c8",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-pcm.ko",
+      "sha256": "e28d15879c360f9ea033b3ef0910c4a85b50dabde704c094a58c37ae3fcf6c14",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hwdep.ko",
+      "sha256": "4b7c4a17678ab2b7a41eb60db6249d826a25eae6bd5e20c8ce116897a48828c9",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hda-core.ko",
+      "sha256": "413ba3e62ecf4e404fadd29709b1d788766062f8d36f726a4d2ac0e6e509bd04",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hda-codec.ko",
+      "sha256": "63cdd7dcd2a9f85d06a6f026cd354df5fee7f544d0e6819e69e08f09d5b9baed",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hda-codec-generic.ko",
+      "sha256": "0609fb6b4a42b59f9959fbce890a5a5efb011a69f5a090859b444723f1b51503",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hda-codec-cirrus.ko",
+      "sha256": "2f358310a767ae526c7e9396e26aa14ef622b2103264594468cfad974185bd51",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hda-codec-realtek.ko",
+      "sha256": "b72d3dec625adc674e52d3643ba600e6f6986eaf2ed73f377fcdbbec31fb3046",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-intel-dspcfg.ko",
+      "sha256": "52637d37167e2ef6beb48d294fd924be250d6b54a1b29b3f93c3b0fe2cf9ad73",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
+    },
+    {
+      "file": "snd-hda-intel.ko",
+      "sha256": "4147f17ac2838bc78f5ce34fcca0dabf2bb80f8490598db2385371ef10936f9f",
+      "source": "http://tinycorelinux.net/15.x/x86_64/tcz/alsa-modules-6.6.8-tinycore64.tcz",
+      "archive_sha256": "0029be6784718c85dc72d2663b3b54d56d0e8602607d1b00ba605c313a54598c"
     }
   ]
 }

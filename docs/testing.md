@@ -5,7 +5,7 @@
 Dreizehn Python-Tests prüfen Installer-Schutzmaßnahmen, Gerätewechsel vor dem Schreiben,
 Abbruch und Probelauf, Kopieren und Prüfsummen, Fehler beim Aushängen, das enge
 Downloadmanifest, Commit-Pinning und den tatsächlichen Inhalt des RAM-Dateisystems.
-Die drei ELF-Programme haben keinen dynamischen Interpreter. GRUB prüft die
+Die vier ELF-Programme haben keinen dynamischen Interpreter. GRUB prüft die
 Konfigurationssyntax. Die C-Programme werden mit `-Wall -Wextra -Werror` gebaut.
 
 `scripts/test-qemu.py` erstellt eine temporäre GPT/FAT32-USB-Disk und startet sie
@@ -75,7 +75,7 @@ zusätzlich ein PNG der laufenden VM gespeichert.
 ## CPU und Sensoren
 
 Fixture-Tests prüfen die Auswahl des Energiesparmodus, unveränderte Lüfterdateien,
-den Umgang mit fehlenden Sensoren und die Prüfsummen der vier Kernelmodule.
+den Umgang mit fehlenden Sensoren und die Prüfsummen der ausgelieferten Kernelmodule.
 QEMU prüft zusätzlich den Start der Überwachung und verträgliche Fehler bei
 nicht unterstützten virtuellen Sensoren. `tdm.test=1` verhindert auch das Laden
 von `applesmc`. QEMU kann weder Lüfterregelung noch Temperaturen des iMac bestätigen.
@@ -85,3 +85,22 @@ Displayumschaltung. Ohne diese Datei bleibt der normale Start mit Logo aktiv.
 Die Sensorüberwachung verändert keine Lüfterwerte und ist kein zusätzlicher
 Überhitzungsschutz. CPU-Frequenz, Temperaturen und Lüfterdrehzahlen müssen noch
 am echten iMac überprüft werden.
+
+## Experimentelle Audioinitialisierung
+
+Der QEMU-Test enthält eine virtuelle HDA-Soundkarte. Er prüft, dass der HDA-Treiber
+geladen, eine Soundkarte erkannt und ein Mixerregler geschrieben wird. Logo und
+Power-Taste werden anschließend weiterhin geprüft. Dies bestätigt nicht den
+DisplayPort-Audioeingang oder die Lautsprecher des echten iMac.
+
+`/audio` startet nach den TDM-Befehlen parallel zur Sensorüberwachung. Es lädt
+versionsgebundene ALSA/HDA-Module (Cirrus, Realtek und generischer Codec), aktiviert
+nur benannte Master-/Speaker-Wiedergabeschalter und stellt Master-/Speaker-/PCM-
+Wiedergabelautstärken auf 40 % ihres numerischen Bereichs. Das ist keine
+kalibrierte akustische Lautstärke. Capture-, Kopfhörer-, Routing- und unbekannte
+Regler bleiben unverändert. Es sendet keine undokumentierten Codec-Verben oder
+zusätzlichen SMC-Befehle. HDA-Stromsparen bleibt für den Test ausgeschaltet.
+
+Das Testsystem bindet keine Datenträger ein und enthält keinen Platteninstaller.
+Audio-Logs in `/run/audio.txt` verschwinden beim Ausschalten. Der Codec und eine
+möglicherweise zusätzlich notwendige TDM-Audioroute müssen am iMac geprüft werden.
