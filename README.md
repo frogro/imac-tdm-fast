@@ -42,9 +42,15 @@ kurz sichtbar bleiben. Das Projekt ist kein Apple-Produkt.
 Nach der Displayumschaltung aktiviert das System den CPU-Energiesparmodus,
 soweit der Prozessor ihn unterstützt. Es liest alle 15 Sekunden verfügbare
 Temperaturen und Lüfterdrehzahlen. Die automatische Lüfterregelung bleibt beim
-SMC des iMac; das Programm verändert keine Lüftervorgaben.
+SMC des iMac. Auf dem getesteten iMac11,1 werden die Mindestdrehzahlen erhöht:
+ODD und HDD auf 1.800, CPU auf 1.500 U/min. Bereits höhere Mindestwerte bleiben
+erhalten; bei Bedarf kann der SMC weiter hochregeln. Andere Modelle bleiben unverändert.
+Mit `tdm.fans=0` in der Linux-Bootzeile lässt sich diese Anpassung beim Start überspringen.
 **Es wird kein Grafiktreiber geladen.** Das Startlogo nutzt nur den vorhandenen
-Framebuffer. Ob der iMac dadurch kühler läuft, muss am Gerät gemessen werden.
+Framebuffer. Im gut fünfminütigen Lüftertest am iMac11,1 sank der Netzteil-Sensor
+`Tp2H` von 78,8 auf 72,0 °C und die GPU-Diode von 61,8 auf 56,5 °C.
+Die höheren Mindestdrehzahlen können hörbarer sein; die Werte sind Messungen
+an diesem Gerät, keine Temperaturgrenzwerte.
 
 Zur Diagnose eine leere Datei **`diagnostics.txt`** im Hauptverzeichnis des
 USB-Sticks anlegen. Beim nächsten Start bleibt der iMac auf seiner internen
@@ -182,3 +188,11 @@ Ein separater [einmaliger Installationsstick](docs/internal-installer.md) kann d
 interne Seagate ST31000528AS mit 1 TB loeschen und TDM Fast dort installieren.
 Eine vorhandene, markierte TDM-Fast-Installation wird ohne neue Partitionierung
 aktualisiert. Dieser Sondermodus startet automatisch und wird separat gebaut.
+
+### GPU-Stromverbrauch beim getesteten iMac11,1
+
+Auf dem Board `Mac-F2268DAE` mit Radeon `1002:944a` wird nach dem TDM-Start die PCIe-Verbindung einmal für 30 Sekunden unterbrochen und anschließend wiederhergestellt. Zwei Hardwaretests zeigten dabei einen Rückgang der internen GPU-Leistungsanzeige von ungefähr 34 W auf 12–13 W bei erhaltenem Bild und Ton. Das ist keine vollständige Stromabschaltung und keine Messung des Gesamtverbrauchs an der Steckdose. Andere Modelle werden übersprungen; ein Radeon-Treiber wird nicht geladen.
+
+Der Vorgang läuft im Hintergrund, sobald Audio und Temperatursensor verfügbar sind. Er betrifft auch die ungenutzte HDMI-Audiofunktion der Radeon, nicht die Cirrus-Audio-Schleife. Protokoll: `/run/gpu-idle.log`. Zum Abschalten der Anpassung `tdm.gpu_idle=0` an die Linux-Bootzeile anhängen. Die Rückkehr zur internen Grafikausgabe nach diesem Vorgang ist nicht geprüft.
+
+Die Audiovermittlung verwendet einen Zielpuffer von 100 ms. Begrenzte Fehlerprotokolle liegen nur im RAM unter `/run/audio-0.log` und `/run/audio-1.log`; sie verschwinden beim Neustart.

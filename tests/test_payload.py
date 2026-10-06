@@ -35,12 +35,12 @@ class PayloadTests(unittest.TestCase):
         self.assertTrue(( {'dev', 'proc', 'sys', 'dev/console', 'dev/null',
             'init', 'smc', 'audio', 'splash.gray', 'health', 'modules', 'run'} |
             {'modules/'+item['file'] for item in modules['files']}) <= set(files))
-        for name in ('bin/busybox','bin/amixer','bin/alsaloop','audio-start.sh','usr/share/alsa/alsa.conf'):
+        for name in ('bin/busybox','bin/amixer','bin/alsaloop','audio-start.sh','gpu-start.sh','gpu-idle','usr/share/alsa/alsa.conf'):
             self.assertIn(name, files)
         self.assertNotIn('speaker-test.wav',files)
         self.assertNotIn('audio-route-test.sh',files)
         with tempfile.TemporaryDirectory() as tmp:
-            for name in ('init', 'smc', 'health', 'audio'):
+            for name in ('init', 'smc', 'health', 'audio', 'gpu-idle'):
                 path = Path(tmp)/name; path.write_bytes(files[name])
                 header = subprocess.check_output(['readelf', '-l', str(path)], text=True)
                 self.assertNotIn('INTERP', header)

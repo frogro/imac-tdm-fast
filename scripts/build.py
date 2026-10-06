@@ -35,7 +35,7 @@ def build():
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
         env = dict(os.environ, SOURCE_DATE_EPOCH='0')
-        for name, source in [('init', 'src/init.c'), ('smc', 'src/smc/SmcDumpKey.c'), ('health', 'src/health.c'), ('audio', 'src/audio.c')]:
+        for name, source in [('init', 'src/init.c'), ('smc', 'src/smc/SmcDumpKey.c'), ('health', 'src/health.c'), ('audio', 'src/audio.c'), ('gpu-idle', 'src/gpu-idle.c')]:
             subprocess.run(['musl-gcc', '-idirafter', '/usr/include', '-idirafter', '/usr/include/x86_64-linux-gnu', '-static', '-Os', '-s', '-Wall', '-Wextra', '-Werror',
                 '-fno-ident', '-Wl,--build-id=none', '-o', str(work/name), str(ROOT/source)], check=True, env=env)
         records = []
@@ -43,7 +43,7 @@ def build():
             records.append((name, b'', stat.S_IFDIR | 0o755, 0, 0))
         records += [('dev/console', b'', stat.S_IFCHR | 0o600, 5, 1),
                     ('dev/null', b'', stat.S_IFCHR | 0o666, 1, 3)]
-        for name in ('init', 'smc', 'health', 'audio'):
+        for name in ('init', 'smc', 'health', 'audio', 'gpu-idle'):
             records.append((name, (work/name).read_bytes(), stat.S_IFREG | 0o755, 0, 0))
         modules = json.loads((ROOT/'vendor/modules/manifest.json').read_text())
         if modules['kernel'] != provenance['kernel_version']:
@@ -67,6 +67,7 @@ def build():
                 add_runtime(dep.lstrip('/'),Path(dep).read_bytes(),0o755)
         for p in Path('/usr/share/alsa').rglob('*'):
             if p.is_file():add_runtime(str(p).lstrip('/'),p.read_bytes())
+        add_runtime('gpu-start.sh',(ROOT/'src/gpu-start.sh').read_bytes(),0o755)
         add_runtime('audio-start.sh',(ROOT/'src/audio-start.sh').read_bytes(),0o755)
         known={r[0] for r in records}
         directories={str(p) for n in runtime for p in Path(n).parents if str(p)!='.'} - known

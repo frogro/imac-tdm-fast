@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only
- * Post-TDM CPU power saving and read-only thermal/fan telemetry.
- * No GPU driver, no fan-control writes, no disk mounts.
+ * Post-TDM CPU power saving, model-specific fan minima and telemetry.
+ * No GPU driver, no manual fan mode, no disk mounts.
  */
 #define _GNU_SOURCE
 #include <dirent.h>
@@ -78,6 +78,57 @@ static void configure_cpu(void) {
     }
     closedir(dir);
 }
+
+static bool cooling_configured;
+static bool read_relative(const char *relative, char *value, size_t size) {
+    char path[1400]; path_for(path,sizeof path,relative);
+    return read_value(path,value,size);
+}
+static bool read_number(const char *relative, long *number) {
+    char value[64], *end;
+    if (!read_relative(relative,value,sizeof value)) return false;
+    errno=0; *number=strtol(value,&end,10);
+    return !errno && end!=value && !*end && *number>=0;
+}
+static void configure_fans(void) {
+    char value[1024], relative[256];
+    if (!read_relative("/sys/class/dmi/id/product_name",value,sizeof value) || strcmp(value,"iMac11,1")) return;
+    if (!read_relative("/sys/class/dmi/id/board_name",value,sizeof value) || strcmp(value,"Mac-F2268DAE")) return;
+    if (read_relative("/proc/cmdline",value,sizeof value) && has_word(value,"tdm.fans=0")) {
+        puts("health: increased cooling disabled by boot option"); return;
+    }
+    const char *labels[]={"ODD","HDD","CPU"};
+    const long targets[]={1800,1800,1500};
+    long previous[3];
+    /* Validate every fan before changing anything. Never lower an existing minimum. */
+    for(int i=0;i<3;i++) {
+        long manual,max;
+        snprintf(relative,sizeof relative,"/sys/devices/platform/applesmc.768/fan%d_label",i+1);
+        if (!read_relative(relative,value,sizeof value)) return;
+        value[strcspn(value," \t")]=0;
+        if (strcmp(value,labels[i])) return;
+        snprintf(relative,sizeof relative,"/sys/devices/platform/applesmc.768/fan%d_manual",i+1);
+        if (!read_number(relative,&manual) || manual!=0) return;
+        snprintf(relative,sizeof relative,"/sys/devices/platform/applesmc.768/fan%d_max",i+1);
+        if (!read_number(relative,&max) || max<targets[i]) return;
+        snprintf(relative,sizeof relative,"/sys/devices/platform/applesmc.768/fan%d_min",i+1);
+        if (!read_number(relative,&previous[i]) || previous[i]>max) return;
+    }
+    cooling_configured=true;
+    for(int i=0;i<3;i++) {
+        char path[1400]; long actual;
+        if (previous[i]>=targets[i]) continue;
+        snprintf(relative,sizeof relative,"/sys/devices/platform/applesmc.768/fan%d_min",i+1);
+        path_for(path,sizeof path,relative);
+        FILE *f=fopen(path,"w");
+        bool ok=false;
+        if (f) { ok=fprintf(f,"%ld\n",targets[i])>0; if(fclose(f))ok=false; }
+        if (!ok || !read_number(relative,&actual) || actual<targets[i]) {
+            cooling_configured=false; printf("health: %s minimum write/readback failed\n",labels[i]);
+        } else printf("health: %s minimum %ld RPM; automatic control preserved\n",labels[i],actual);
+    }
+}
+
 static bool sensor_attribute(const char *name) {
     const char *p;
     bool fan = !strncmp(name, "fan", 3);
@@ -148,12 +199,12 @@ static void snapshot(FILE *out) {
         closedir(dir);
     }
     if (!sensors) fputs("Temperature/fan readings unavailable; cooling is NOT verified\n",out);
-    fputs("Fan settings unchanged; no GPU modules loaded\n",out);
+    fputs(cooling_configured ? "Increased fan minima active; automatic SMC control; no GPU modules loaded\n" : "Fan profile not applied or incomplete; inspect fan telemetry; no GPU modules loaded\n",out);
     fflush(out);
 }
 int main(int argc, char **argv) {
     if (argc == 3 && !strcmp(argv[1],"--fixture")) {
-        root=argv[2]; configure_cpu(); snapshot(stdout); return 0;
+        root=argv[2]; configure_cpu(); configure_fans(); snapshot(stdout); return 0;
     }
     bool diagnostic = argc == 2 && !strcmp(argv[1],"--diagnostics");
     bool test = argc == 2 && !strcmp(argv[1],"--test");
@@ -169,6 +220,7 @@ int main(int argc, char **argv) {
     /* Never access SMC in the VM test mode. In production TDM has finished first. */
     if (!test) load_module("applesmc");
     configure_cpu();
+    if (!test) configure_fans();
     mkdir("/run",0700);
     for (;;) {
         while (waitpid(-1,NULL,WNOHANG)>0) {}

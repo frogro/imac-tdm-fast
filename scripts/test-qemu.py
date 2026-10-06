@@ -48,7 +48,7 @@ def test(screenshot=None):
                 while time.monotonic() < deadline:
                     text = log.read_text(errors='replace') if log.exists() else ''
                     if ('Power button ready' in text and 'TEST: SMC hardware access disabled' in text
-                        and 'Fan settings unchanged; no GPU modules loaded' in text
+                        and 'Fan profile not applied or incomplete; inspect fan telemetry; no GPU modules loaded' in text
                         and 'audio: setup finished' in text
                         and 'audio-loop: started continuous route' in text): break
                     if proc.poll() is not None: raise RuntimeError('QEMU exited: '+(work/'qemu.log').read_text()+text)

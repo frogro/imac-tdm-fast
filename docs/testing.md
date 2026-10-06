@@ -74,7 +74,7 @@ zusätzlich ein PNG der laufenden VM gespeichert.
 
 ## CPU und Sensoren
 
-Fixture-Tests prüfen die Auswahl des Energiesparmodus, unveränderte Lüfterdateien,
+Fixture-Tests prüfen die Auswahl des Energiesparmodus, die Modellprüfung der Lüfteranpassung,
 den Umgang mit fehlenden Sensoren und die Prüfsummen der ausgelieferten Kernelmodule.
 QEMU prüft zusätzlich den Start der Überwachung und verträgliche Fehler bei
 nicht unterstützten virtuellen Sensoren. `tdm.test=1` verhindert auch das Laden
@@ -82,8 +82,9 @@ von `applesmc`. QEMU kann weder Lüfterregelung noch Temperaturen des iMac best�
 
 `diagnostics.txt` auf dem Stick aktiviert eine Textkonsole und überspringt die
 Displayumschaltung. Ohne diese Datei bleibt der normale Start mit Logo aktiv.
-Die Sensorüberwachung verändert keine Lüfterwerte und ist kein zusätzlicher
-Überhitzungsschutz. CPU-Frequenz, Temperaturen und Lüfterdrehzahlen müssen noch
+Die Sensorüberwachung ist kein zusätzlicher Überhitzungsschutz. Beim getesteten
+iMac11,1 werden erhöhte Mindestdrehzahlen gesetzt, ohne den manuellen Modus zu aktivieren.
+CPU-Frequenz, Temperaturen und Lüfterdrehzahlen müssen
 am echten iMac überprüft werden.
 
 ## Dauerhafte Audioweiterleitung

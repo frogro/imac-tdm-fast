@@ -56,6 +56,26 @@ class HealthTests(unittest.TestCase):
             self.assertIn('cooling is NOT verified',text)
             self.assertIn('CPU frequency scaling unavailable',text)
 
+    def test_fan_minima_preserve_automatic_mode_and_higher_values(self):
+        for scenario in ('normal','higher','other_board','manual','low_max','opt_out'):
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp)
+                self.fixture(root,'sys/class/dmi/id/product_name','iMac11,1')
+                self.fixture(root,'sys/class/dmi/id/board_name','other' if scenario=='other_board' else 'Mac-F2268DAE')
+                self.fixture(root,'proc/cmdline','quiet tdm.fans=0' if scenario=='opt_out' else 'quiet')
+                base='sys/devices/platform/applesmc.768/'
+                mins=[2000,2000,1700] if scenario=='higher' else [1000,1100,940]
+                for i,(label,maximum) in enumerate(zip(('ODD ','HDD ','CPU '),(3800,5500,2100)),1):
+                    self.fixture(root,base+f'fan{i}_label',label)
+                    self.fixture(root,base+f'fan{i}_manual','1' if scenario=='manual' and i==3 else '0')
+                    self.fixture(root,base+f'fan{i}_max',str(1400 if scenario=='low_max' and i==3 else maximum))
+                    self.fixture(root,base+f'fan{i}_min',str(mins[i-1]))
+                subprocess.run([str(self.binary),'--fixture',tmp],check=True,stdout=subprocess.DEVNULL)
+                expected=[1800,1800,1500] if scenario=='normal' else mins
+                for i,target in enumerate(expected,1):
+                    self.assertEqual((root/(base+f'fan{i}_min')).read_text(),str(target)+'\n')
+                    self.assertEqual((root/(base+f'fan{i}_manual')).read_text(),('1' if scenario=='manual' and i==3 else '0')+'\n')
+
     def test_pinned_modules_match_kernel_and_exclude_gpu(self):
         manifest=json.loads((ROOT/'vendor/modules/manifest.json').read_text())
         self.assertEqual(manifest['kernel'],json.loads((ROOT/'sources.json').read_text())['kernel_version'])

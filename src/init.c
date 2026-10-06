@@ -217,6 +217,10 @@ int main(void) {
     if (worker == 0) {
         if (diagnostic) logmsg("DIAGNOSTICS: display stays internal; TDM commands skipped");
         else if (start_tdm(test)) logmsg("TDM startup failed; continuing with CPU/sensor setup");
+        else if (!test && fork() == 0) {
+            execl("/bin/busybox", "busybox", "sh", "/gpu-start.sh", (char *)NULL);
+            _exit(127);
+        }
         pid_t audio = fork();
         if (audio == 0) {
             if (test) execl("/bin/busybox", "busybox", "sh", "/audio-start.sh", "--test", (char *)NULL);

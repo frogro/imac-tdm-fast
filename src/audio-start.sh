@@ -27,9 +27,21 @@ if [ "$1" != --test ]; then
  amixer -c "$card" -- sset 'Bass Speaker' -6dB unmute >> /run/audio-route.txt 2>&1 || exit 1
  amixer -c "$card" cset name='IEC958 Capture Switch' on >> /run/audio-route.txt 2>&1 || exit 1
 fi
+# Two rotating RAM logs, at most 256 lines of 512 characters each per file.
+$B rm -f /run/audio-log.pipe
+$B mkfifo /run/audio-log.pipe || exit 1
+# Keep the FIFO open across alsaloop retries.
+exec 3<>/run/audio-log.pipe
+$B awk '
+BEGIN { n=0; slot=0; file="/run/audio-0.log"; printf "" > file }
+{
+ if(n>=256) {close(file); slot=1-slot; file="/run/audio-" slot ".log"; printf "" > file; n=0}
+ print systime(), substr($0,1,512) > file; fflush(file); n++
+}' < /run/audio-log.pipe &
+logger=$!
+trap 'kill "$logger" 2>/dev/null' EXIT
 while :; do
- # Overwrite each retry log; no unbounded logs and no persistent storage.
- alsaloop -C "$capture" -P "plughw:$card,0" -f S16_LE -r 48000 -c 2 -t 50000 -S 1 > /dev/null 2>&1 &
+ alsaloop -C "$capture" -P "plughw:$card,0" -f S16_LE -r 48000 -c 2 -t 100000 -S 1 -U > /run/audio-log.pipe 2>&1 &
  child=$!
  $B sleep 1
  if [ "$1" = --test ]; then
