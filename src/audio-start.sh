@@ -41,7 +41,7 @@ BEGIN { n=0; slot=0; file="/run/audio-0.log"; printf "" > file }
 logger=$!
 trap 'kill "$logger" 2>/dev/null' EXIT
 while :; do
- alsaloop -C "$capture" -P "plughw:$card,0" -f S16_LE -r 48000 -c 2 -t 100000 -S 1 -U > /run/audio-log.pipe 2>&1 &
+ alsaloop -C "$capture" -P "plughw:$card,0" -f S16_LE -r 48000 -c 2 -t 50000 -S 1 -U > /run/audio-log.pipe 2>&1 &
  child=$!
  $B sleep 1
  if [ "$1" = --test ]; then

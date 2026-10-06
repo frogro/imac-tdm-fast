@@ -36,9 +36,13 @@ Die Fehlermeldung vorher klaeren; Marker nicht einfach unbeaufsichtigt entfernen
 
 ## Fertiges Installationspaket
 
-Das geprüfte Paket mit Audioweiterleitung steht im
+Das ältere Paket mit Audioweiterleitung steht im
 [Release v0.2.0-audio](https://github.com/frogro/imac-tdm-fast/releases/tag/v0.2.0-audio).
-`imac-tdm-fast-hdd-installer.tar.gz` herunterladen und entpacken. Im enthaltenen
+**Dieses Release enthält nicht automatisch die späteren Änderungen aus `main`.**
+Für die aktuelle Fassung mit 50-ms-Audiozielpuffer sowie den aktuellen Kühlungs-
+und GPU-Anpassungen den Installer wie unten beschrieben aus `main` neu erzeugen.
+
+Für den älteren Release-Stand `imac-tdm-fast-hdd-installer.tar.gz` herunterladen und entpacken. Im enthaltenen
 Verzeichnis liegt auch `install-usb.py`; damit den gewünschten USB-Stick schreiben:
 
 ```sh

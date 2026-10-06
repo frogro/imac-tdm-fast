@@ -3,6 +3,10 @@
 Ein USB-Stick macht den **27″-iMac von Ende 2009** direkt zum Monitor.
 Kein Pi, kein WLAN-Taster und kein Bootmenü nötig.
 
+Alternativ lässt sich das System mit dem separaten
+[USB-Installer auf die interne HDD installieren](docs/internal-installer.md).
+Danach wird kein USB-Stick mehr benötigt.
+
 - **Stick eingesteckt:** Der iMac startet vom Stick und schaltet automatisch auf den externen Bildeingang.
 - **Stick entfernt:** Die Mac-Firmware kann auf ein vorhandenes bootfähiges internes Betriebssystem zurückfallen; dieses Verhalten am eigenen iMac prüfen.
 - **Powerknopf kurz drücken:** Das RAM-System fordert sofortiges Ausschalten an.
@@ -77,6 +81,67 @@ Die separate [USB-Audiodiagnose](docs/audio-diagnostic.md) ist nur für Fehlersu
 bestimmt; sie erzeugt Testtöne und schaltet danach automatisch aus.
 
 Für Live-Fehlersuche gibt es außerdem eine separate [LAN-/SSH-Diagnosefassung](docs/ssh-diagnostic.md). Sie lässt die interne Installation unverändert.
+
+### Linux-Abspielrechner: Aussetzer nach Pausen vermeiden
+
+Für den angeschlossenen Linux-Rechner empfehlen wir, den automatischen
+Audio-Ruhezustand des DisplayPort-Ausgangs und die HD-Audio-Stromsparfunktion
+abzuschalten. Im Vergleichstest traten mit den bisherigen Einstellungen nach
+Pause/Fortsetzen kurze Aussetzer auf; mit beiden Anpassungen blieben drei
+Wiederholungen sauber. Das ist kein Nachweis für alle Geräte oder Langzeitbetrieb.
+Die Einstellungen gehören auf den **Abspielrechner**, nicht auf den iMac.
+
+**1. PipeWire/WirePlumber 0.5: DisplayPort-Ausgang aktiv lassen.**
+Mit `pactl list short sinks` den Namen des verwendeten Ausgangs ermitteln.
+`~/.config/wireplumber/wireplumber.conf.d/51-imac-displayport-no-suspend.conf`
+anlegen (Verzeichnis gegebenenfalls mit `mkdir -p` erstellen):
+
+```ini
+monitor.alsa.rules = [
+  {
+    matches = [ { node.name = "DEIN_DISPLAYPORT_AUSGANG" } ]
+    actions = {
+      update-props = {
+        session.suspend-timeout-seconds = 0
+        node.pause-on-idle = false
+      }
+    }
+  }
+]
+```
+
+`DEIN_DISPLAYPORT_AUSGANG` durch den vollständigen Namen aus der Liste ersetzen.
+Ein DisplayPort-Ausgang kann im Namen `hdmi` enthalten. Danach
+`systemctl --user restart wireplumber` ausführen; dabei wird der Ton kurz
+unterbrochen. Wiedergabe gegebenenfalls erneut starten.
+
+**2. Bei Verwendung von `snd_hda_intel`: `power_save=0` setzen.**
+Den bisherigen Wert mit `cat /sys/module/snd_hda_intel/parameters/power_save`
+notieren. Falls die Datei fehlt, gilt dieser Schritt nicht für den verwendeten
+Treiber. Eine vorhandene gleichnamige Konfigurationsdatei vorher sichern.
+
+```bash
+# Sofort wirksam:
+echo 0 | sudo tee /sys/module/snd_hda_intel/parameters/power_save
+# Für folgende Starts:
+echo 'options snd_hda_intel power_save=0' | sudo tee /etc/modprobe.d/99-tdm-audio-powersave.conf
+# Unter Ubuntu/Debian auch das Startabbild aktualisieren:
+sudo update-initramfs -u
+```
+
+Dies gilt für alle vom Treiber `snd_hda_intel` verwalteten Audiogeräte.
+Andere Distributionen verwenden gegebenenfalls einen anderen Befehl zum
+Aktualisieren des Startabbilds. Der Rechner kann im Leerlauf etwas mehr Strom
+verbrauchen. Der DisplayPort-Ausgang bleibt für direkten exklusiven ALSA-Zugriff
+belegt; normale PipeWire-Anwendungen können ihn weiter gemeinsam verwenden.
+
+Zum Rückgängigmachen die neu angelegten Dateien entfernen beziehungsweise ihre
+Sicherungen zurückspielen, WirePlumber neu starten und das Startabbild erneut
+aktualisieren. Den zuvor notierten `power_save`-Wert wieder in die Datei unter
+`/sys/module/` schreiben oder den Rechner neu starten.
+
+Details: [WirePlumber-Audio-Ruhezustand](https://pipewire.pages.freedesktop.org/wireplumber/daemon/configuration/alsa.html)
+und [Linux-HD-Audio-Stromsparfunktion](https://docs.kernel.org/sound/designs/powersave.html).
 
 ## Was ist schneller?
 
@@ -195,4 +260,4 @@ Auf dem Board `Mac-F2268DAE` mit Radeon `1002:944a` wird nach dem TDM-Start die 
 
 Der Vorgang läuft im Hintergrund, sobald Audio und Temperatursensor verfügbar sind. Er betrifft auch die ungenutzte HDMI-Audiofunktion der Radeon, nicht die Cirrus-Audio-Schleife. Protokoll: `/run/gpu-idle.log`. Zum Abschalten der Anpassung `tdm.gpu_idle=0` an die Linux-Bootzeile anhängen. Die Rückkehr zur internen Grafikausgabe nach diesem Vorgang ist nicht geprüft.
 
-Die Audiovermittlung verwendet einen Zielpuffer von 100 ms. Begrenzte Fehlerprotokolle liegen nur im RAM unter `/run/audio-0.log` und `/run/audio-1.log`; sie verschwinden beim Neustart.
+Die Audiovermittlung verwendet einen Zielpuffer von 50 ms. Begrenzte Fehlerprotokolle liegen nur im RAM unter `/run/audio-0.log` und `/run/audio-1.log`; sie verschwinden beim Neustart.

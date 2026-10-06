@@ -103,3 +103,16 @@ das unveränderte Logo und Ausschalten per ACPI-Taste. Der virtuelle Test ersetz
 nicht den Hardwarebeleg. Langzeitbetrieb und weitere Signalquellen sind damit
 nicht umfassend getestet. ALSA-Prozesse laufen parallel zur Sensorüberwachung;
 Datenträger bleiben im normalen TDM-Betrieb ungemountet.
+
+## Pause-/Fortsetzvergleich am 6. Oktober 2026
+
+Ein lokaler 90-Sekunden-Testton am iMac und derselbe kontinuierliche Ton vom
+Linux-Mini-PC über DisplayPort waren hörbar sauber. Drei Pause-/Fortsetzzyklen
+mit lokaler Wiedergabe am Mini-PC erzeugten dagegen zusätzliche hörbare Störungen.
+Nach Abschalten des WirePlumber-Suspend für diesen Ausgang und Setzen von
+`snd_hda_intel.power_save=0` blieb die Wiederholung laut Besitzer sauber; der
+ALSA-Ausgang blieb auch in den Pausen RUNNING mit unverändertem Startzeitpunkt.
+Diese Vergleichstests liefen mit 100 ms Zielpuffer am iMac. Anschließend wurde
+der Zielpuffer auf die ursprünglichen 50 ms zurückgestellt. Die Anleitung für
+den Abspielrechner steht in der README; beide Maßnahmen wurden zusammen geprüft,
+ihr jeweiliger Einzelbeitrag ist nicht bestimmt.
