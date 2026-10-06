@@ -1,0 +1,17 @@
+{
+  "kernel": "6.6.8-tinycore64",
+  "source_url": "http://tinycorelinux.net/15.x/x86_64/release/distribution_files/corepure64.gz",
+  "source_sha256": "19c671bab458b3d2464759427517d7b4ec92e4c22e16391f8d591a0d332ac7be",
+  "files": [
+    {
+      "file": "tg3.ko",
+      "source_path": "kernel/drivers/net/ethernet/broadcom/tg3.ko.gz",
+      "sha256": "37cfdebba4b006f99b9c5e84476965354a895264329b6093f3e1d7cda5577983"
+    },
+    {
+      "file": "e1000.ko",
+      "source_path": "kernel/drivers/net/ethernet/intel/e1000/e1000.ko.gz",
+      "sha256": "55bb2d2d6d86038dc3c8ffc122dff06a1f6a29d87d4a0d304132594cef3053bc"
+    }
+  ]
+}

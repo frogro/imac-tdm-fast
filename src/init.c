@@ -207,6 +207,12 @@ int main(void) {
     bool diagnostic = boot_flag(cmdline, "tdm.diagnostics=1");
     if (!diagnostic) draw_splash();
     logmsg("Minimal RAM system started");
+#ifdef TDM_SSH_DIAGNOSTIC
+    if (fork() == 0) {
+        execl("/bin/busybox", "busybox", "sh", "/ssh-start.sh", (char *)NULL);
+        _exit(127);
+    }
+#endif
     pid_t worker = fork();
     if (worker == 0) {
         if (diagnostic) logmsg("DIAGNOSTICS: display stays internal; TDM commands skipped");

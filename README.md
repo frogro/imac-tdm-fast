@@ -70,6 +70,8 @@ Die Initialisierung läuft im Hintergrund und verzögert die Bildumschaltung nic
 Die separate [USB-Audiodiagnose](docs/audio-diagnostic.md) ist nur für Fehlersuche
 bestimmt; sie erzeugt Testtöne und schaltet danach automatisch aus.
 
+Für Live-Fehlersuche gibt es außerdem eine separate [LAN-/SSH-Diagnosefassung](docs/ssh-diagnostic.md). Sie lässt die interne Installation unverändert.
+
 ## Was ist schneller?
 
 Das Projekt basiert auf [tinycore-tdm](https://github.com/frogro/tinycore-tdm),

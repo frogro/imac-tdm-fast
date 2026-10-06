@@ -20,3 +20,9 @@ jobs:
           sudo apt-get install -y busybox-static file util-linux
           python3 scripts/build-disk-installer.py work/internal-installer
           python3 scripts/test-disk-installer.py work/internal-installer
+      - name: Build and test private SSH diagnostic
+        run: |
+          sudo apt-get install -y dropbear-bin openssh-client
+          ssh-keygen -q -t ed25519 -N '' -f /tmp/tdm-test-key
+          python3 scripts/build-ssh-diagnostic.py /tmp/tdm-ssh --authorized-key /tmp/tdm-test-key.pub
+          python3 scripts/test-ssh-diagnostic.py /tmp/tdm-ssh --identity /tmp/tdm-test-key
