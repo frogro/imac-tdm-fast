@@ -33,7 +33,7 @@ def test(screenshot=None):
         shutil.copyfile('/usr/share/OVMF/OVMF_VARS_4M.fd', work/'vars.fd')
         log = work/'serial.log'
         qmp_path = work/'qmp.sock'
-        args = ['qemu-system-x86_64', '-machine', 'q35', '-m', '256', '-no-reboot',
+        args = ['qemu-system-x86_64', '-machine', 'q35', '-smp', '2', '-m', '256', '-no-reboot',
             '-audiodev', 'driver=none,id=testaudio',
             '-device', 'intel-hda', '-device', 'hda-duplex,audiodev=testaudio',
             '-display', 'none', '-serial', 'file:'+str(log),

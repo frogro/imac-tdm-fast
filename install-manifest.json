@@ -13,8 +13,8 @@
     },
     {
       "path": "boot/fast.gz",
-      "size": 5364159,
-      "sha256": "e79c46bdef3d71bd71a41e5e32d7fb81b8cc9fdc75e40efa37a11b453bcc53a5"
+      "size": 5364128,
+      "sha256": "2b4c5802cba0de09d322bd71fc19626839cf2de5f0845800bddd458c770433bc"
     },
     {
       "path": "boot/splash.png",

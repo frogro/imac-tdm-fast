@@ -15,7 +15,7 @@ def test(payload,identity):
   with socket.socket() as s:s.bind(('127.0.0.1',0));port=s.getsockname()[1]
   host=(payload/'ssh-host-key.pub').read_text().strip().split()
   (w/'known_hosts').write_text('[127.0.0.1]:%d %s %s\n'%(port,host[0],host[1]))
-  args=['qemu-system-x86_64','-machine','q35','-m','256','-display','none','-no-reboot',
+  args=['qemu-system-x86_64','-machine','q35','-smp','2','-m','256','-display','none','-no-reboot',
    '-serial','file:'+str(w/'serial.log'),'-audiodev','driver=none,id=testaudio','-device','intel-hda','-device','hda-duplex,audiodev=testaudio',
    '-drive','if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd',
    '-drive','if=pflash,format=raw,file='+str(w/'vars'),

@@ -2,8 +2,6 @@
 # Continuous digital-input -> speaker route, verified on iMac11,1/CS4206.
 export PATH=/bin
 B=/bin/busybox
-# Serial tracing is confined to the virtual hardware test mode.
-if [ "$1" = --test ]; then set -x; fi
 if [ "$1" = --test ]; then /audio --test; else /audio; fi
 [ "$?" = 0 ] || exit 1
 $B mdev -s
