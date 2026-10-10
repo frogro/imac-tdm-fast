@@ -2,6 +2,8 @@
 # Continuous digital-input -> speaker route, verified on iMac11,1/CS4206.
 export PATH=/bin
 B=/bin/busybox
+# Serial tracing is confined to the virtual hardware test mode.
+if [ "$1" = --test ]; then set -x; fi
 if [ "$1" = --test ]; then /audio --test; else /audio; fi
 [ "$?" = 0 ] || exit 1
 $B mdev -s
@@ -21,11 +23,11 @@ else
  capture=hw:$card,1
 fi
 # Preserve the exact dB settings validated with the owner's YouTube test.
-amixer -c "$card" -- sset Master -12dB unmute > /run/audio-route.txt 2>&1 || exit 1
+amixer -c "$card" -- sset Master -12dB unmute > /run/audio-route.txt 2>&1 || { $B cat /run/audio-route.txt >&2; exit 1; }
 if [ "$1" != --test ]; then
- amixer -c "$card" -- sset Speaker -6dB unmute >> /run/audio-route.txt 2>&1 || exit 1
- amixer -c "$card" -- sset 'Bass Speaker' -6dB unmute >> /run/audio-route.txt 2>&1 || exit 1
- amixer -c "$card" cset name='IEC958 Capture Switch' on >> /run/audio-route.txt 2>&1 || exit 1
+ amixer -c "$card" -- sset Speaker -6dB unmute >> /run/audio-route.txt 2>&1 || { $B cat /run/audio-route.txt >&2; exit 1; }
+ amixer -c "$card" -- sset 'Bass Speaker' -6dB unmute >> /run/audio-route.txt 2>&1 || { $B cat /run/audio-route.txt >&2; exit 1; }
+ amixer -c "$card" cset name='IEC958 Capture Switch' on >> /run/audio-route.txt 2>&1 || { $B cat /run/audio-route.txt >&2; exit 1; }
 fi
 # Two rotating RAM logs, at most 256 lines of 512 characters each per file.
 $B rm -f /run/audio-log.pipe
