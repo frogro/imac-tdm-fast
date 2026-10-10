@@ -31,12 +31,12 @@ def usb_image(work,payload,name):
     fat.unlink()
     return image
 
-def boot(work,target,usb,tag,expect,model='ST31000528AS',shutdown=True,internal=False, target_usb=False, second=None):
+def boot(work,target,usb,tag,expect,model='ST31000528AS',shutdown=True,internal=False, target_usb=False, second=None, mac_model="iMac11,1"):
     vars=work/(tag+'.vars');shutil.copyfile('/usr/share/OVMF/OVMF_VARS_4M.fd',vars)
     log=work/(tag+'.log');qmp=work/(tag+'.qmp')
     args=['qemu-system-x86_64','-machine','q35','-m','256','-display','none','-no-reboot',
           '-serial','file:'+str(log),'-qmp','unix:'+str(qmp)+',server=on,wait=off',
-          '-smbios','type=1,manufacturer=Apple Inc.,product=iMac11,,1',
+          '-smbios','type=1,manufacturer=Apple Inc.,product='+mac_model.replace(',', ',,'),
           '-drive','if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd',
           '-drive','if=pflash,format=raw,file='+str(vars),
           '-drive','if=none,id=internal,format=qcow2,file='+str(target),
@@ -96,10 +96,10 @@ def main(payload):
         unchanged('ambiguous-disks',target,'Mehrere interne SATA-Platten',second=other)
         assert other_before==run('qemu-img','map','--output=json',str(other)).stdout
         # Different vendor and size must both install, including >2 TB GPT media.
-        boot(w,other,usb,'generic-8g-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.',model='GENERIC-SATA-SSD')
+        boot(w,other,usb,'generic-8g-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.',model='GENERIC-SATA-SSD',mac_model='iMac10,1')
         large=w/'large.qcow2';run('qemu-img','create','-f','qcow2',str(large),'3T')
         large_usb=usb_image(w,payload,'large-usb')
-        boot(w,large,large_usb,'generic-3t-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.',model='GENERIC-SATA-HDD')
+        boot(w,large,large_usb,'generic-3t-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.',model='GENERIC-SATA-HDD',mac_model='iMac11,3')
         usb=usb_image(w,payload,'original-usb')
         boot(w,target,usb,'install','ERFOLGREICH: TDM Fast intern installiert und geprueft.')
         reference=w/'installed-reference.qcow2';shutil.copyfile(target,reference)

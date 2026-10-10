@@ -11,7 +11,8 @@ USB-Ziellaufwerke werden ausgeschlossen. Bei mehreren internen SATA-Platten
 stoppt der Installer, statt automatisch eine auszuwählen; die anderen internen
 Platten müssen vor der Installation getrennt werden. Angezeigt werden das
 tatsächlich erkannte Modell und seine Größe. Die Modellkennung des iMac muss
-`iMac10,1` oder `iMac11,1` sein; unterstützt ist nur der 27-Zoll-iMac von Ende 2009.
+`iMac10,1`, `iMac11,1` oder `iMac11,3` sein (27 Zoll, Ende 2009 oder Mitte 2010).
+`iMac10,1` und `iMac11,3` sind freigegeben, aber nicht an echter Hardware getestet.
 Die reale Installation wurde auf einer Seagate ST31000528AS mit 1 TB getestet;
 andere Hersteller und Kapazitäten sind freigegeben, aber nicht alle physisch geprüft.
 

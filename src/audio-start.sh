@@ -8,13 +8,19 @@ $B mdev -s
 if [ "$1" = --test ]; then
  card=0; capture=hw:0,0
 else
- [ "$($B cat /sys/class/dmi/id/product_name)" = iMac11,1 ] || exit 0
- [ "$($B cat /sys/class/dmi/id/board_name)" = Mac-F2268DAE ] || exit 0
+ model="$($B cat /sys/class/dmi/id/product_name)"
+ case "$model" in
+  iMac11,1) [ "$($B cat /sys/class/dmi/id/board_name)" = Mac-F2268DAE ] || exit 0 ;;
+  iMac10,1|iMac11,3) ;; # Experimental: same CS4206 route, not hardware-tested.
+  *) exit 0 ;;
+ esac
  card=''
  for c in /proc/asound/card[0-9]*; do
   [ -f "$c/codec#0" ] || continue
   $B grep -q '^Vendor Id: 0x10134206$' "$c/codec#0" || continue
-  $B grep -q '^Subsystem Id: 0x106b5100$' "$c/codec#0" || continue
+  if [ "$model" = iMac11,1 ]; then
+   $B grep -q '^Subsystem Id: 0x106b5100$' "$c/codec#0" || continue
+  fi
   card=${c##*card}; break
  done
  [ -n "$card" ] || exit 1

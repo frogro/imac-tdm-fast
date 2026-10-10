@@ -60,7 +60,7 @@ report() {
 model=$(cat /sys/class/dmi/id/product_name)
 case " $(cat /proc/cmdline) " in *' diag.test=1 '*) test=yes;; *) test=no;; esac
 if [ "$test" = yes ]; then timeout 20 /audio --test; else
- case "$model" in iMac10,1|iMac11,1) ;; *) umount /source; fail 'Nicht unterstuetztes iMac-Modell';; esac
+ case "$model" in iMac10,1|iMac11,1|iMac11,3) ;; *) umount /source; fail 'Nicht unterstuetztes iMac-Modell';; esac
  [ "$(cat /sys/class/dmi/id/sys_vendor)" = 'Apple Inc.' ] || { umount /source; fail 'Kein Apple iMac'; }
  timeout 20 /audio
 fi

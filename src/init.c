@@ -128,8 +128,8 @@ static int start_tdm(bool test) {
     read_text("/sys/class/dmi/id/sys_vendor", vendor, sizeof vendor);
     read_text("/sys/class/dmi/id/product_name", model, sizeof model);
     if (!strstr(vendor, "Apple") ||
-        (strcmp(model, "iMac10,1") && strcmp(model, "iMac11,1"))) {
-        logmsg("Unsupported hardware: this build targets the late-2009 27-inch iMac. No SMC writes.");
+        (strcmp(model, "iMac10,1") && strcmp(model, "iMac11,1") && strcmp(model, "iMac11,3"))) {
+        logmsg("Unsupported hardware: this build targets the late-2009/mid-2010 27-inch iMac. No SMC writes.");
         return 1;
     }
     logmsg("TDM: writing MVHR=1");

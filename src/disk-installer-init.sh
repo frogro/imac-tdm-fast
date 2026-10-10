@@ -23,7 +23,7 @@ finish() {
 }
 echo 'iMac TDM Fast - einmalige Installation auf interne SATA-Platte'
 [ "$(cat /sys/class/dmi/id/sys_vendor)" = 'Apple Inc.' ] || fail 'Kein Apple-iMac'
-case "$(cat /sys/class/dmi/id/product_name)" in iMac10,1|iMac11,1) ;; *) fail 'Falsches iMac-Modell';; esac
+case "$(cat /sys/class/dmi/id/product_name)" in iMac10,1|iMac11,1|iMac11,3) ;; *) fail 'Falsches iMac-Modell';; esac
 # Wait for USB and SATA enumeration, bounded to 30 seconds.
 tries=0
 while :; do

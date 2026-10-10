@@ -1,6 +1,6 @@
 # iMac TDM Fast
 
-Use a **27-inch Late 2009 iMac** as a DisplayPort monitor. The system starts automatically in Target Display Mode (TDM). **Video and audio over DisplayPort have been tested on an iMac11,1 with Cirrus CS4206**, with sound through the iMac speakers.
+Use a **27-inch Late 2009 or Mid 2010 iMac** as a DisplayPort monitor. The system starts automatically in Target Display Mode (TDM). **Video and audio over DisplayPort have been tested on an iMac11,1 with Cirrus CS4206**, with sound through the iMac speakers.
 
 Choose either installation method:
 
@@ -11,7 +11,7 @@ Both methods run the same TDM system.
 
 ## Requirements
 
-- A 27-inch Late 2009 iMac; see the tested and untested configurations below. The 21.5-inch 2009 model is not supported.
+- A 27-inch Late 2009 or Mid 2010 iMac; see the tested and untested configurations below. The 21.5-inch 2009 model is not supported.
 - A DisplayPort source connected to the iMac's Mini DisplayPort input, using a suitable cable or adapter.
 
 ### Tested and potentially compatible models
@@ -19,14 +19,14 @@ Both methods run the same TDM system.
 | Model | Status in this project |
 | --- | --- |
 | 27-inch Late 2009, `iMac11,1` | **Tested:** DisplayPort video and audio on board `Mac-F2268DAE`, Cirrus CS4206 (codec `1013:4206`, subsystem `106b:5100`). |
-| 27-inch Late 2009, `iMac10,1` | **Potentially compatible for video, not tested here.** The display-switching code permits this model, but audio forwarding is not enabled. |
-| 27-inch Mid 2010, `iMac11,3` | A candidate for future work because it has DisplayPort TDM hardware. **Not supported by the current build:** its model is excluded by the display-switching and audio checks. |
+| 27-inch Late 2009, `iMac10,1` | **Enabled, not tested:** DisplayPort video switching and experimental CS4206 audio forwarding. Uses the same audio route as `iMac11,1`; sound is not verified on this model. |
+| 27-inch Mid 2010, `iMac11,3` | **Enabled, not tested:** DisplayPort video switching and experimental CS4206 audio forwarding. Uses the same route as the tested 2009 model. |
 | TDM-capable iMacs from 2011–2013 | **Not supported by this project.** They require Thunderbolt TDM, not the DisplayPort connection used here. |
 
 The CS4206 is not unique to the tested model: [AppleALC documents it in the iMac12,2](https://github.com/acidanthera/AppleALC/blob/master/Resources/PinConfigs.kext/Contents/Info.plist).
 A matching codec name does not establish matching audio wiring or TDM support.
-This build enables audio only for the tested model, board and codec identifiers;
-other machines are not advertised as working audio configurations.
+Audio is enabled for the tested `iMac11,1` board/codec identifiers and experimentally for `iMac10,1` and `iMac11,3` with a CS4206 codec. These models do not require the `iMac11,1` board or subsystem ID; their input and speaker routing still need a hardware test.
+The GPU power-saving workaround and raised fan minima remain specific to the tested `iMac11,1` hardware; they are not applied to the untested models.
 The related [gpdm/tinycore-targetdisplaymode project](https://github.com/gpdm/tinycore-targetdisplaymode#does-this-work-on-all-macs) also reports testing only a 2009 iMac; its broader compatibility statement is theoretical. Its [open iMac13,2 / Late 2012 report](https://github.com/gpdm/tinycore-targetdisplaymode/issues/9) documents failed SMC switching. These reports do not establish support for later models in this project.
 See also [Apple's TDM connection requirements](https://support.apple.com/en-us/105126) and the [2010 DisplayPort input specification](https://support.apple.com/en-ie/112566).
 

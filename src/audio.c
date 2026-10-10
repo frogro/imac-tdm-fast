@@ -73,7 +73,7 @@ int main(int argc,char **argv) {
     if(uname(&u) || strcmp(u.release,"6.6.8-tinycore64"))return 1;
     if(!test && (!readtext("/sys/class/dmi/id/sys_vendor",vendor,sizeof vendor) ||
         !readtext("/sys/class/dmi/id/product_name",model,sizeof model) || !strstr(vendor,"Apple") ||
-        (strcmp(model,"iMac10,1") && strcmp(model,"iMac11,1"))))return 1;
+        (strcmp(model,"iMac10,1") && strcmp(model,"iMac11,1") && strcmp(model,"iMac11,3"))))return 1;
     mkdir("/run",0700);mkdir("/dev/snd",0755);
     int serial=test ? dup(STDOUT_FILENO) : -1;
     FILE *log=fopen("/run/audio.txt","w");
