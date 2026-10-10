@@ -80,8 +80,6 @@ Replace `/dev/sdX` with the installation USB drive. This is an **automatic insta
 
 Boot the iMac from this USB drive using **Option/Alt**. Installation starts automatically after a 15-second countdown. When the iMac switches off, remove the USB drive and turn it on again. Select the internal **EFI Boot** entry if necessary.
 
-See the [internal installer instructions](docs/internal-installer.md) for supported disks, updates and recovery details.
-
 ## Everyday use
 
 1. Connect the DisplayPort source to the iMac.
