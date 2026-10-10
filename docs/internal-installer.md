@@ -1,19 +1,26 @@
 # Einmaliger Installer fuer die interne iMac-Platte
 
-Dieser Modus ist ausschliesslich fuer den freigegebenen iMac mit interner
-**Seagate ST31000528AS, 1 TB, SATA** bestimmt. Bei einer Erstinstallation entfernt er automatisch
-alle bisherigen Partitionen auf dieser Platte. Eine bereits mit `TDM_FAST_INSTALLED`
-markierte Installation erhält stattdessen nur die neuen Bootdateien einschließlich Tonweiterleitung. **Keine Datensicherung ist enthalten.**
-Andere Modelle, USB-Ziellaufwerke und mehrere passende Platten werden abgelehnt.
-Die Modellkennung des iMac muss `iMac10,1` oder `iMac11,1` sein; unterstuetzt ist
-nur der 27-Zoll-iMac von Ende 2009.
+Dieser Modus akzeptiert interne **SATA-HDDs und SATA-SSDs beliebiger Hersteller
+ab 1 GiB**, sofern genau ein internes SATA-Laufwerk vorhanden ist.
+**Bei einer Erstinstallation werden alle Daten und Partitionen der Zielplatte
+gelöscht. Benötigte Daten vorher extern sichern.** Eine bereits mit
+`TDM_FAST_INSTALLED` markierte Installation erhält stattdessen nur die neuen
+Bootdateien. Es ist keine Datensicherung enthalten.
+
+USB-Ziellaufwerke werden ausgeschlossen. Bei mehreren internen SATA-Platten
+stoppt der Installer, statt automatisch eine auszuwählen; die anderen internen
+Platten müssen vor der Installation getrennt werden. Angezeigt werden das
+tatsächlich erkannte Modell und seine Größe. Die Modellkennung des iMac muss
+`iMac10,1` oder `iMac11,1` sein; unterstützt ist nur der 27-Zoll-iMac von Ende 2009.
+Die reale Installation wurde auf einer Seagate ST31000528AS mit 1 TB getestet;
+andere Hersteller und Kapazitäten sind freigegeben, aber nicht alle physisch geprüft.
 
 Der Stick zeigt das Ziel an und wartet 15 Sekunden. In dieser Zeit kann man durch
 langes Druecken des Powerknopfs ausschalten. Bei einer Erstinstallation legt er eine GPT mit einer
 512-MiB-FAT32-EFI-Partition an und installiert die normale TDM-Fast-Fassung.
 Der Rest der Platte bleibt unpartitioniert. Partitionstabellen und alte
 Dateisystemsignaturen werden entfernt; dies ist **keine sichere Vollueberschreibung**
-der persoenlichen Daten auf der gesamten 1-TB-Platte.
+der persönlichen Daten auf der gesamten Platte.
 
 Nach Kopieren und erneutem Lesen mit SHA-256-Pruefung schaltet sich der iMac aus.
 Den USB-Stick abziehen und den iMac wieder einschalten. Falls die Mac-Firmware
@@ -39,8 +46,9 @@ Die Fehlermeldung vorher klaeren; Marker nicht einfach unbeaufsichtigt entfernen
 Das ältere Paket mit Audioweiterleitung steht im
 [Release v0.2.0-audio](https://github.com/frogro/imac-tdm-fast/releases/tag/v0.2.0-audio).
 **Dieses Release enthält nicht automatisch die späteren Änderungen aus `main`.**
-Für die aktuelle Fassung mit 50-ms-Audiozielpuffer sowie den aktuellen Kühlungs-
-und GPU-Anpassungen den Installer wie unten beschrieben aus `main` neu erzeugen.
+Für die aktuelle Fassung ohne Seagate-/1-TB-Bindung, mit 50-ms-Audiozielpuffer
+und den aktuellen Kühlungs- und GPU-Anpassungen den Installer wie unten beschrieben
+aus `main` neu erzeugen. Das alte Release hat weiterhin die alte Plattenbeschränkung.
 
 Für den älteren Release-Stand `imac-tdm-fast-hdd-installer.tar.gz` herunterladen und entpacken. Im enthaltenen
 Verzeichnis liegt auch `install-usb.py`; damit den gewünschten USB-Stick schreiben:
@@ -91,8 +99,9 @@ jeweiligen Paketlizenzen. Der Builder installiert nichts auf dem Build-System.
 ## Tests
 
 Der QEMU-Test verwendet ausschliesslich temporaere Images, eine virtuelle
-1-TB-SATA-Platte und eine simulierte iMac-DMI-Kennung. Er prueft die Ablehnung
-eines falschen Plattenmodells, Installation, Einmalsperre, Erkennung einer bereits
+SATA-Platten unterschiedlicher Modelle und Größen sowie eine simulierte
+iMac-DMI-Kennung. Er prüft die Ablehnung zu kleiner, externer USB- und mehrdeutiger
+interner Ziele, Installation auf 8-GiB-, 1-TB- und 3-TiB-Platten, Einmalsperre, Erkennung einer bereits
 installierten Platte, Aktualisierung mit verändertem Payload und anschliessenden Start von der internen Platte ohne USB.
 Bei diesem letzten Test gilt wieder die normale QEMU-DMI-Kennung, damit keine
 SMC-Umschaltbefehle ausgefuehrt werden. Die reale Displayumschaltung und die

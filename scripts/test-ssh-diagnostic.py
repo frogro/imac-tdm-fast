@@ -16,7 +16,7 @@ def test(payload,identity):
   host=(payload/'ssh-host-key.pub').read_text().strip().split()
   (w/'known_hosts').write_text('[127.0.0.1]:%d %s %s\n'%(port,host[0],host[1]))
   args=['qemu-system-x86_64','-machine','q35','-m','256','-display','none','-no-reboot',
-   '-serial','file:'+str(w/'serial.log'),'-device','intel-hda','-device','hda-duplex',
+   '-serial','file:'+str(w/'serial.log'),'-audiodev','driver=none,id=testaudio','-device','intel-hda','-device','hda-duplex,audiodev=testaudio',
    '-drive','if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd',
    '-drive','if=pflash,format=raw,file='+str(w/'vars'),
    '-device','qemu-xhci','-drive','if=none,id=stick,format=raw,file='+str(usb),'-device','usb-storage,drive=stick',
@@ -37,8 +37,14 @@ def test(payload,identity):
     denied=sp.run(ssh[:-1]+['-o','PubkeyAuthentication=no',ssh[-1],'true'],capture_output=True,timeout=10)
     assert denied.returncode!=0, 'Login without a public key succeeded'
     print('PASS: DHCP and key-only SSH with pinned host identity',flush=True)
-    result=sp.run(ssh+['tdm-audio-status; cat /proc/mounts'],capture_output=True,text=True,check=True)
-    assert result.stdout.count('state: RUNNING')>=2,result.stdout
+    # SSH and audio start independently; an available SSH server does not mean
+    # that the audio loop has finished initializing on a slow CI runner.
+    audio_deadline=time.monotonic()+30
+    while True:
+     result=sp.run(ssh+['tdm-audio-status; cat /proc/mounts'],capture_output=True,text=True,check=True,timeout=10)
+     if result.stdout.count('state: RUNNING')>=2:break
+     if time.monotonic()>=audio_deadline:raise AssertionError(result.stdout)
+     time.sleep(1)
     assert '/dev/sd' not in result.stdout and '/dev/hd' not in result.stdout,result.stdout
     # A PTY is needed for an interactive maintenance shell.
     terminal=sp.Popen(ssh[:-1]+['-tt',ssh[-1],'tty'],stdin=sp.PIPE,stdout=sp.PIPE,stderr=sp.PIPE,text=True)

@@ -31,7 +31,7 @@ def usb_image(work,payload,name):
     fat.unlink()
     return image
 
-def boot(work,target,usb,tag,expect,model='ST31000528AS',shutdown=True,internal=False):
+def boot(work,target,usb,tag,expect,model='ST31000528AS',shutdown=True,internal=False, target_usb=False, second=None):
     vars=work/(tag+'.vars');shutil.copyfile('/usr/share/OVMF/OVMF_VARS_4M.fd',vars)
     log=work/(tag+'.log');qmp=work/(tag+'.qmp')
     args=['qemu-system-x86_64','-machine','q35','-m','256','-display','none','-no-reboot',
@@ -41,6 +41,11 @@ def boot(work,target,usb,tag,expect,model='ST31000528AS',shutdown=True,internal=
           '-drive','if=pflash,format=raw,file='+str(vars),
           '-drive','if=none,id=internal,format=qcow2,file='+str(target),
           '-device','ide-hd,drive=internal,bus=ide.0,model='+model+',serial=TDM-INSTALL-TEST,bootindex=2']
+    if target_usb:
+        args[-2:]=['-device','qemu-xhci,id=external','-device','usb-storage,bus=external.0,drive=internal,removable=false']
+    if second:
+        args += ['-drive','if=none,id=second,format=qcow2,file='+str(second),
+                 '-device','ide-hd,drive=second,bus=ide.1,model=SECOND-DISK']
     if internal:
         i=args.index('-smbios');del args[i:i+2]
     if usb:
@@ -77,10 +82,25 @@ def main(payload):
         w=Path(tmp);target=w/'internal.qcow2'
         run('qemu-img','create','-f','qcow2',str(target),'1000204886016')
         usb=usb_image(w,payload,'usb')
-        # Wrong-model guard must stop before allocating any guest disk sectors.
-        before=run('qemu-img','map','--output=json',str(target)).stdout
-        boot(w,target,usb,'wrong-model','Interne ST31000528AS mit 1 TB nicht gefunden',model='OTHER-DISK',shutdown=False)
-        assert before==run('qemu-img','map','--output=json',str(target)).stdout
+        # Rejections must not allocate any sectors on candidate disks.
+        # Mounting the installer USB read/write may change FAT bookkeeping.
+        def unchanged(tag, disk, expect, **kwargs):
+            before=run('qemu-img','map','--output=json',str(disk)).stdout
+            boot(w,disk,usb,tag,expect,shutdown=False,**kwargs)
+            assert before==run('qemu-img','map','--output=json',str(disk)).stdout
+        small=w/'small.qcow2';run('qemu-img','create','-f','qcow2',str(small),'512M')
+        unchanged('too-small',small,'Interne Platte kleiner als 1 GiB',model='SMALL-DISK')
+        unchanged('usb-target-rejected',target,'Keine interne SATA-Platte gefunden',target_usb=True)
+        other=w/'other.qcow2';run('qemu-img','create','-f','qcow2',str(other),'8G')
+        other_before=run('qemu-img','map','--output=json',str(other)).stdout
+        unchanged('ambiguous-disks',target,'Mehrere interne SATA-Platten',second=other)
+        assert other_before==run('qemu-img','map','--output=json',str(other)).stdout
+        # Different vendor and size must both install, including >2 TB GPT media.
+        boot(w,other,usb,'generic-8g-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.',model='GENERIC-SATA-SSD')
+        large=w/'large.qcow2';run('qemu-img','create','-f','qcow2',str(large),'3T')
+        large_usb=usb_image(w,payload,'large-usb')
+        boot(w,large,large_usb,'generic-3t-install','ERFOLGREICH: TDM Fast intern installiert und geprueft.',model='GENERIC-SATA-HDD')
+        usb=usb_image(w,payload,'original-usb')
         boot(w,target,usb,'install','ERFOLGREICH: TDM Fast intern installiert und geprueft.')
         reference=w/'installed-reference.qcow2';shutil.copyfile(target,reference)
         boot(w,target,usb,'used-usb','Dieser Stick wurde bereits verwendet.')

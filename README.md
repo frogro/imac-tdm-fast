@@ -5,7 +5,7 @@ Use a **27-inch Late 2009 iMac** as a DisplayPort monitor. The system starts aut
 Choose either installation method:
 
 - **USB:** boot from a USB drive and leave the internal disk unchanged.
-- **Internal HDD:** install on the supported internal disk and boot without a USB drive.
+- **Internal HDD:** install on an internal SATA HDD or SSD and boot without a USB drive.
 
 Both methods run the same TDM system.
 
@@ -27,6 +27,7 @@ The CS4206 is not unique to the tested model: [AppleALC documents it in the iMac
 A matching codec name does not establish matching audio wiring or TDM support.
 This build enables audio only for the tested model, board and codec identifiers;
 other machines are not advertised as working audio configurations.
+The related [gpdm/tinycore-targetdisplaymode project](https://github.com/gpdm/tinycore-targetdisplaymode#does-this-work-on-all-macs) also reports testing only a 2009 iMac; its broader compatibility statement is theoretical. Its [open iMac13,2 / Late 2012 report](https://github.com/gpdm/tinycore-targetdisplaymode/issues/9) documents failed SMC switching. These reports do not establish support for later models in this project.
 See also [Apple's TDM connection requirements](https://support.apple.com/en-us/105126) and the [2010 DisplayPort input specification](https://support.apple.com/en-ie/112566).
 
 An HDMI source requires an active HDMI-to-DisplayPort converter compatible with the iMac's input; a passive cable is not sufficient.
@@ -58,10 +59,11 @@ Insert the drive into the powered-off iMac and turn it on. If necessary, hold **
 
 Use a separate, one-time installation USB drive to install the same system on the internal HDD. After installation, remove the USB drive and boot from the internal disk.
 
-**The internal installer currently accepts only a Seagate ST31000528AS 1 TB SATA disk in a supported iMac. A first installation erases that disk. Back up its contents first.** An existing marked TDM Fast installation is updated without repartitioning.
+**WARNING: A first installation deletes all data and partitions on the selected internal disk. Back up everything you need before booting the installation USB.** An existing marked TDM Fast installation is updated without repartitioning.
 
-Apple offered the 27-inch Late 2009 iMac with a **1 TB HDD or optional 2 TB HDD** ([Apple specifications](https://support.apple.com/en-gb/112564)).
-The exact Seagate model above is the disk tested for installation here. Other HDDs or replacement SSDs may be usable after adapting and testing the installer, but **the current HDD installer rejects them**. This restriction does not apply to normal USB boot, which leaves the internal disk unchanged.
+The installer accepts **internal SATA HDDs and SSDs from any manufacturer, at least 1 GiB**, in the supported iMac models. It displays the detected model and capacity before starting. USB disks are excluded. If more than one internal SATA disk is present, it stops without choosing one; disconnect the other internal disks before installing. The remaining space beyond the 512 MiB boot partition is left unallocated. Deleting partitions is not a secure overwrite of every data sector.
+
+**Tested on real hardware:** Seagate ST31000528AS, 1 TB. Other brands and capacities are accepted, but have not all been physically tested. Apple offered the 27-inch Late 2009 iMac with a [1 TB HDD or optional 2 TB HDD](https://support.apple.com/en-gb/112564). Normal USB boot leaves the internal disk unchanged.
 
 On an **x86-64 Linux computer** (the commands below use Ubuntu/Debian), prepare the installer from the repository:
 
