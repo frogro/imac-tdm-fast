@@ -38,7 +38,7 @@ class InstallerTests(unittest.TestCase):
              patch.object(installer.shutil, 'which', return_value='/mock/tool'), \
              patch.object(installer.os, 'geteuid', return_value=0), \
              patch.object(installer.sys.stdin, 'isatty', return_value=True), \
-             patch('builtins.input', return_value='nein') as prompt, \
+             patch('builtins.input', return_value='no') as prompt, \
              patch.object(installer, 'install') as install:
             installer.main(['--device', '/dev/null', '--dry-run', '--source', str(installer.ROOT)])
             prompt.assert_not_called()

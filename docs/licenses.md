@@ -1,61 +1,60 @@
-# Herkunft und Lizenzen
+# Sources and licenses
 
-Die neuen Projektquellen stehen unter GPL-2.0-only, siehe [LICENSE](../LICENSE).
-Installer und SMC-Ausgangscode stammen aus
+New project sources are licensed under GPL-2.0-only; see [LICENSE](../LICENSE).
+The installer and original SMC code come from
 [frogro/tinycore-tdm](https://github.com/frogro/tinycore-tdm/tree/ae161a92deb09950d4419b2a60188cc7b92ac623).
-Der ursprüngliche SMC-Autor ist Gabriel L. Somlo; die TDM-Erweiterung stammt aus
-[floe/smc_util](https://github.com/floe/smc_util). Die ursprünglichen Copyright-
-und Lizenzhinweise bleiben in `src/smc/SmcDumpKey.c` und `src/smc/COPYING` erhalten.
+The original SMC author is Gabriel L. Somlo; the TDM extension comes from
+[floe/smc_util](https://github.com/floe/smc_util). Original copyright and license
+notices are preserved in `src/smc/SmcDumpKey.c` and `src/smc/COPYING`.
 
-## Mitgelieferte Komponenten
+## Bundled components
 
-| Komponente | Herkunft | Lizenz |
+| Component | Source | License |
 | --- | --- | --- |
-| Linux 6.6.8-tinycore64 | Unverändertes `boot/vmlinuz` aus dem festgelegten Upstream-Commit | GPL-2.0, Details im Kernelquelltext |
-| GRUB 2.14-2ubuntu2.1 | EFI-Image aus den Ubuntu-Modulen mit `grub-mkstandalone` erstellt | GPL-3.0-or-later, siehe `licenses/grub-copyright.txt` |
-| musl 1.2.5-3build1 | Statisch in die vier Programme eingebunden | MIT und enthaltene Hinweise, siehe `licenses/musl-copyright.txt` |
+| Linux 6.6.8-tinycore64 | Unmodified `boot/vmlinuz` from the pinned upstream commit | GPL-2.0; see kernel sources for details |
+| GRUB 2.14-2ubuntu2.1 | EFI image built from Ubuntu modules using `grub-mkstandalone` | GPL-3.0-or-later; see `licenses/grub-copyright.txt` |
+| musl 1.2.5-3build1 | Statically linked into the project executables | MIT and included notices; see `licenses/musl-copyright.txt` |
 
-Die vollständigen Kernelquellen einschließlich TinyCore-Patches und Kernelkonfiguration,
-die GRUB-Quellen einschließlich Ubuntu-Patches sowie musl-Quellen sind als Dateien
-im [Quellen-Release](https://github.com/frogro/imac-tdm/releases/tag/sources-v1)
-verfügbar. Die ursprünglichen Downloadadressen und SHA-256-Werte stehen in
-[source-archives.json](../source-archives.json). Das sind Entwicklerquellen;
-für die Stick-Installation lädt der Installer nur das kleine Bootpaket.
+Complete kernel sources, including TinyCore patches and kernel configuration,
+GRUB sources with Ubuntu patches, and musl sources are available in the
+[source release](https://github.com/frogro/imac-tdm/releases/tag/sources-v1).
+Original download URLs and SHA-256 hashes are recorded in
+[source-archives.json](../source-archives.json). These are development sources;
+the USB installer downloads only the small boot payload.
 
-`scripts/build.py` enthält die Befehle zum Erzeugen des Initramfs und des EFI-Images.
-Beim Neubau auf einer anderen Distribution können musl-/GRUB-Versionen und damit
-Binärdateien abweichen; die Distribution liefert die dazugehörigen Paketquellen.
-Der verwendete Kernel wird beim Neubau ausdrücklich gegen `sources.json` geprüft.
+`scripts/build.py` contains the commands used to build the initramfs and EFI image.
+Rebuilding on another distribution may use different musl/GRUB versions and
+produce different binaries; that distribution provides the corresponding package
+sources. The build explicitly verifies the kernel against `sources.json`.
 
-## Startgrafik
+## Boot artwork
 
-Das Apple-Symbol stammt aus [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/apple.svg).
-Die CC0-Lizenz liegt unter `assets/simple-icons-LICENSE.md`. `assets/splash.svg`
-setzt das Symbol auf einen schwarzen Hintergrund. Apple und das Apple-Logo sind
-Marken von Apple Inc.; das Projekt steht in keiner Verbindung zu Apple.
-Die eingebettete ASCII-Schrift stammt aus dem GRUB-Paket, dessen Lizenzhinweise
-unter `licenses/grub-copyright.txt` enthalten sind.
+The Apple icon comes from [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/apple.svg).
+Its CC0 license is in `assets/simple-icons-LICENSE.md`. `assets/splash.svg`
+places the icon on a black background. Apple and the Apple logo are trademarks
+of Apple Inc.; this project is not affiliated with Apple.
+The embedded ASCII font comes from GRUB; its license notices are included in
+`licenses/grub-copyright.txt`.
 
-## Kernelmodule
+## Kernel modules
 
-Die unveränderten Module unter `vendor/modules/` gehören zu
-Linux 6.6.8-tinycore64. Herkunft und Prüfsummen stehen in
+The unmodified modules in `vendor/modules/` belong to Linux 6.6.8-tinycore64.
+Sources and checksums are recorded in
 [`vendor/modules/manifest.json`](../vendor/modules/manifest.json).
-Die CPU-Module stammen aus dem ursprünglichen TinyCore-Initramfs, die
-Sensormodule aus der offiziellen TinyCore-Erweiterung `hwmon-6.6.8-tinycore64.tcz`.
-Die Audiomodule stammen aus `alsa-modules-6.6.8-tinycore64.tcz`; dessen MD5 wurde
-mit der veröffentlichten TinyCore-Prüfsumme verglichen, zusätzlich werden Archiv
-und einzelne Module per SHA-256 festgehalten.
-Die zugehörigen GPL-Kernelquellen und die Konfiguration sind im oben verlinkten
-Quellen-Release enthalten.
+CPU modules come from the original TinyCore initramfs; sensor modules come from
+the official TinyCore extension `hwmon-6.6.8-tinycore64.tcz`.
+Audio modules come from `alsa-modules-6.6.8-tinycore64.tcz`. Its MD5 was checked
+against TinyCore's published checksum; SHA-256 hashes also record the archive
+and individual modules. Corresponding GPL kernel sources and configuration are
+included in the source release linked above.
 
-## Audiolaufzeit
+## Audio runtime
 
-BusyBox (GPL-2.0), ALSA-utils (GPL-2.0), ALSA-lib und glibc (überwiegend LGPL)
-sowie libsamplerate (BSD-2-Clause) werden aus den Ubuntu-Paketen übernommen.
-Die vollständigen Lizenzhinweise stehen unter `licenses/`; die Paketversionen
-des ausgelieferten Images stehen in `vendor/audio-runtime.json`.
-Passende Originalquellen und Distributionspatches stehen ebenfalls im oben
-verlinkten Quellen-Release und in `source-archives.json`. Die Bibliotheken
-bleiben dynamisch eingebunden; der Builder kann mit geänderten Bibliotheken
-ein neues Image erzeugen. Es gibt keine Signaturprüfung, die solche Änderungen sperrt.
+BusyBox (GPL-2.0), ALSA-utils (GPL-2.0), ALSA-lib and glibc (primarily LGPL),
+and libsamplerate (BSD-2-Clause) are taken from Ubuntu packages.
+Full license notices are in `licenses/`; package versions for the shipped image
+are recorded in `vendor/audio-runtime.json`.
+Corresponding upstream sources and distribution patches are also available in
+the source release and `source-archives.json`. Libraries remain dynamically
+linked; the builder can generate a new image using modified libraries.
+No signature check prevents such modifications.

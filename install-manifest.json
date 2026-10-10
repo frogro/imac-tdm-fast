@@ -23,8 +23,8 @@
     },
     {
       "path": "grub.cfg",
-      "size": 822,
-      "sha256": "cb70ead87790c6f1dd663c209b2ed6a3be6a76f49760e8c1886687894545f4fc"
+      "size": 818,
+      "sha256": "db12de7f23ae6852c0da8c58c086bac628b67a37904eb2436ac96ecd5eab462e"
     }
   ]
 }

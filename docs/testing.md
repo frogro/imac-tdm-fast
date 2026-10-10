@@ -1,118 +1,114 @@
-# Prüfung und Grenzen
+# Testing and limitations
 
-## Automatisiert
+## Automated checks
 
-Dreizehn Python-Tests prüfen Installer-Schutzmaßnahmen, Gerätewechsel vor dem Schreiben,
-Abbruch und Probelauf, Kopieren und Prüfsummen, Fehler beim Aushängen, das enge
-Downloadmanifest, Commit-Pinning und den tatsächlichen Inhalt des RAM-Dateisystems.
-Die vier ELF-Programme haben keinen dynamischen Interpreter. GRUB prüft die
-Konfigurationssyntax. Die C-Programme werden mit `-Wall -Wextra -Werror` gebaut.
+Fourteen Python tests check installer safeguards, device changes before writes,
+cancellation and dry runs, copying and checksums, unmount failures, the restricted
+download manifest, commit pinning, and the actual contents of the RAM filesystem.
+The five project ELF executables have no dynamic interpreter. GRUB checks the
+configuration syntax. C programs are built with `-Wall -Wextra -Werror`.
 
-`scripts/test-qemu.py` erstellt eine temporäre GPT/FAT32-USB-Disk und startet sie
-mit x86_64-OVMF. Es verwendet den ausgelieferten EFI-Bootloader, Kernel und das
-RAM-Dateisystem. Nur die Testkopie der GRUB-Konfiguration ergänzt eine serielle
-Konsole und `tdm.test=1`, um alle SMC-Schreibzugriffe auszuschalten.
+`scripts/test-qemu.py` creates a temporary GPT/FAT32 USB disk and boots it with
+x86_64 OVMF, using the shipped EFI bootloader, kernel, and RAM filesystem.
+Only the test copy of the GRUB configuration adds a serial console and
+`tdm.test=1` to disable all SMC writes.
 
-Geprüft am 3. Oktober 2026:
+Initial results from October 3, 2026:
 
-- Firmware → USB-Boot → GRUB → Kernel → minimales `/init` erfolgreich.
-- RAM-System nach etwa **3,0 Sekunden Kernel-Laufzeit** bereit.
-- Gesamter QEMU-/OVMF-/USB-Start bis zur Testbereitschaft etwa **8,0 Sekunden**.
-- ACPI-Power-Tastendruck über QMP wird erkannt; die virtuelle Maschine schaltet aus.
+- Firmware → USB boot → GRUB → kernel → minimal `/init` completed successfully.
+- The RAM system was ready after about **3.0 seconds of kernel runtime**.
+- Total QEMU/OVMF/USB startup to test readiness took about **8.0 seconds**.
+- An ACPI power-button event sent through QMP was detected and powered off the VM.
 
-Diese Zeiten gelten für QEMU mit Softwareemulation auf dem Build-Rechner, nicht
-für den iMac. Im Test wird die einsekündige SMC-Pause nicht ausgeführt, weil alle
-SMC-Zugriffe deaktiviert sind. Hardwarezeiten dürfen daraus nicht abgeleitet werden.
+These are software-emulated QEMU timings on the build host, not iMac timings.
+The test skips the one-second SMC delay because all SMC access is disabled.
+Hardware boot times cannot be inferred from these results.
 
-## Noch am iMac zu prüfen
+## Physical hardware checks
 
-- Automatische USB-Priorität bei eingestecktem Stick und internes OS ohne Stick.
-- Umschaltung mit angeschlossenem DisplayPort-Signal direkt aus dem frühen RAM-System.
-- Kurzer physischer Power-Tastendruck und hardwareseitiges langes Gedrückthalten.
-- Zeit vom Einschalten bis zum tatsächlichen externen Bild.
-- Verhalten bei fehlendem Bildsignal sowie Neustart nach dem Ausschalten.
+The owner confirmed booting, display switching, and audio on the tested iMac11,1.
+Physical display switching is not inferred solely from a successful SMC return code.
+The additional iMac10,1 and iMac11,3 models are enabled but not hardware-tested.
+Checks on each physical setup include:
 
-Das ursprüngliche TDM-System funktionierte laut Besitzer am Originalstick.
-Der Besitzer hat den Start am iMac bestätigt; die neue CPU-/Sensorergänzung ist dort noch nicht geprüft. Die physische
-Bildumschaltung wird nicht aus einer erfolgreichen SMC-Rückgabe abgeleitet.
-Ein per SHA-256 übernommener Kernel reduziert Änderungen an der Hardwarebasis;
-ein individuell verkleinerter Kernel ist eine mögliche spätere Optimierung.
+- Automatic USB priority with the drive inserted and internal OS boot without it.
+- Switching from the early RAM system with an active DisplayPort signal.
+- A short physical power-button press and the hardware long-press shutdown.
+- Time from power-on to the actual external picture.
+- Behavior without an input signal and restarting after poweroff.
 
-## Aufbau
+Using the SHA-256-pinned kernel reduces hardware-related changes.
+A custom reduced kernel remains a possible future optimization.
 
-Der Kernel startet `/init` als PID 1. Es bindet nur `/proc` und `/sys` ein und
-verwendet `/dev` im RAM. Da der TinyCore-Kernel kein devtmpfs bereitstellt,
-erzeugt es die Eingabegerätedateien anhand der vom Kernel gelieferten sysfs-Daten.
-Nach Abschluss der direkten SMC-Umschaltung lädt ein separates Programm
-`acpi-cpufreq`, `cpufreq_powersave`, `coretemp` und `applesmc` für exakt diesen Kernel.
-Dadurch laufen direkte SMC-Befehle und der SMC-Treiber nicht gleichzeitig.
-GPU-Module sind nicht enthalten. Interne Laufwerke und der Stick bleiben ungemountet.
+## Architecture
 
-Ein Kindprozess führt die originale Befehlsfolge aus: `MVHR=1`, eine Sekunde Pause,
-`MVMR=2`. Fehler brechen die Folge ab. Schreibfehler im übernommenen SMC-Programm
-liefern jetzt einen Fehlerstatus statt fälschlich Erfolg. Kein automatisches
-Wiederholen des Umschaltbefehls und keine unbestätigte Statusinterpretation.
+The kernel starts `/init` as PID 1. It mounts only `/proc` and `/sys` and uses
+RAM-backed `/dev`. Because the TinyCore kernel does not provide devtmpfs, it
+creates input-device nodes from kernel-provided sysfs data.
+After direct SMC switching completes, a separate program loads `acpi-cpufreq`,
+`cpufreq_powersave`, `coretemp`, and `applesmc` for this exact kernel.
+Direct SMC commands and the SMC driver therefore do not run concurrently.
+GPU drivers are not included. Internal drives and the USB drive remain unmounted.
 
-PID 1 überwacht unabhängig davon Eingabegeräte mit `KEY_POWER`. Bei einem neuen
-Druck fordert es `RB_POWER_OFF` an. Eine schon beim Erkennen gehaltene Taste wird
-erst nach dem Loslassen wieder scharf geschaltet. Keine Shutdown-Dienste oder
-Dateisystemsicherung sind nötig, weil das System keine persistenten Daten schreibt.
-Langes Gedrückthalten ist die hardwareseitige Funktion und braucht kein Programm.
+A child process executes the original sequence: `MVHR=1`, a one-second delay,
+then `MVMR=2`. Errors abort the sequence. Write failures in the inherited SMC
+program return an error instead of incorrectly reporting success. Switching
+commands are not automatically retried and no unverified status interpretation is used.
 
-## Statische Startgrafik
+PID 1 independently monitors input devices with `KEY_POWER`. A new press requests
+`RB_POWER_OFF`. A button held during discovery is armed only after release.
+No shutdown services or filesystem backup are needed because the system writes
+no persistent data. Long-press shutdown is a hardware function requiring no program.
 
-GRUB schaltet in den Grafikmodus und lädt `boot/splash.png`. Linux verwendet
-`gfxpayload=keep`, eine serielle Konsole und `fbcon=map:1`; normale Meldungen werden
-nicht auf den Bildschirm geschrieben. Da der Kernel den Framebuffer trotzdem
-löschen kann, zeichnet `/init` das Logo über `/dev/fb0` erneut. Fehlt ein
-unterstützter Framebuffer, läuft der TDM-Start ohne Grafik weiter.
+## Static boot artwork
 
-Der QEMU-Test liest nach dem Kernelstart den vollständigen Bildschirm zurück und
-vergleicht jedes RGB-Pixel mit dem erwarteten zentrierten Logo auf Schwarz. Danach
-prüft er wie bisher die ACPI-Power-Taste. Mit `--screenshot /pfad/bild.png` wird
-zusätzlich ein PNG der laufenden VM gespeichert.
+GRUB enters graphics mode and loads `boot/splash.png`. Linux uses
+`gfxpayload=keep`, a serial console, and `fbcon=map:1`; normal messages are kept
+off the display. Because the kernel may still clear the framebuffer, `/init`
+redraws the logo through `/dev/fb0`. If no supported framebuffer is available,
+TDM startup continues without graphics.
 
-## CPU und Sensoren
+The QEMU test reads back the entire display after kernel startup and compares
+every RGB pixel with the expected centered logo on black. It then tests the ACPI
+power button. `--screenshot /path/image.png` also saves a PNG of the running VM.
 
-Fixture-Tests prüfen die Auswahl des Energiesparmodus, die Modellprüfung der Lüfteranpassung,
-den Umgang mit fehlenden Sensoren und die Prüfsummen der ausgelieferten Kernelmodule.
-QEMU prüft zusätzlich den Start der Überwachung und verträgliche Fehler bei
-nicht unterstützten virtuellen Sensoren. `tdm.test=1` verhindert auch das Laden
-von `applesmc`. QEMU kann weder Lüfterregelung noch Temperaturen des iMac bestätigen.
+## CPU and sensors
 
-`diagnostics.txt` auf dem Stick aktiviert eine Textkonsole und überspringt die
-Displayumschaltung. Ohne diese Datei bleibt der normale Start mit Logo aktiv.
-Die Sensorüberwachung ist kein zusätzlicher Überhitzungsschutz. Beim getesteten
-iMac11,1 werden erhöhte Mindestdrehzahlen gesetzt, ohne den manuellen Modus zu aktivieren.
-CPU-Frequenz, Temperaturen und Lüfterdrehzahlen müssen
-am echten iMac überprüft werden.
+Fixture tests check powersave selection, model checks for fan adjustments,
+missing sensors, and checksums of shipped kernel modules. QEMU also checks
+monitor startup and graceful handling of unsupported virtual sensors.
+`tdm.test=1` prevents loading `applesmc`. QEMU cannot verify iMac fan control or temperatures.
 
-## Dauerhafte Audioweiterleitung
+A `diagnostics.txt` file on the drive enables a text console and skips display
+switching. Without it, normal startup with the logo remains active.
+Sensor monitoring does not provide an additional overheating safeguard.
+On the tested iMac11,1, fan minima are raised without enabling manual fan mode.
+CPU frequency, temperatures, and fan speeds require physical hardware verification.
 
-Am 5. Oktober 2026 bestätigte der Besitzer lokale Testtöne und YouTube-Ton vom
-DisplayPort-Mini-PC am iMac11,1 / Mac-F2268DAE / Cirrus CS4206 (Subsystem 106b5100).
-Die normale Fassung übernimmt die geprüften Einstellungen: Master −12 dB,
-Speaker/Bass Speaker −6 dB, IEC958 Capture aktiv. `alsaloop` verbindet `hw:0,1`
-mit `plughw:0,0`, Stereo S16_LE/48 kHz, 50 ms Pufferziel und einfacher
-Taktsynchronisation. Die Kartennummer wird anhand des Codecs ermittelt.
-Es gibt keine Mikrofonweiterleitung, Testtöne oder zeitgesteuerte Abschaltung.
-Andere Modelle erhalten keine unbestätigte digitale Audioroute.
+## Continuous audio forwarding
 
-QEMU prüft beide PCM-Richtungen im Zustand RUNNING, die Initialisierung,
-das unveränderte Logo und Ausschalten per ACPI-Taste. Der virtuelle Test ersetzt
-nicht den Hardwarebeleg. Langzeitbetrieb und weitere Signalquellen sind damit
-nicht umfassend getestet. ALSA-Prozesse laufen parallel zur Sensorüberwachung;
-Datenträger bleiben im normalen TDM-Betrieb ungemountet.
+On October 5, 2026, the owner confirmed local test tones and YouTube audio from
+the DisplayPort mini-PC on iMac11,1 / Mac-F2268DAE / Cirrus CS4206 (subsystem 106b5100).
+The normal build uses those verified settings: Master -12 dB, Speaker/Bass Speaker
+-6 dB, and IEC958 Capture enabled. `alsaloop` connects `hw:0,1` to `plughw:0,0`
+using stereo S16_LE at 48 kHz, a 50 ms target buffer, and simple clock synchronization.
+The card number is discovered from the codec. There is no microphone forwarding,
+test tone, or timed shutdown. The same CS4206 route is now enabled experimentally
+on iMac10,1 and iMac11,3; it remains untested on those models.
 
-## Pause-/Fortsetzvergleich am 6. Oktober 2026
+QEMU checks both PCM directions in RUNNING state, initialization, the unchanged
+logo, and ACPI poweroff. Virtual tests do not replace hardware evidence or establish
+comprehensive long-term operation with other sources. ALSA processes run alongside
+sensor monitoring; disks remain unmounted during normal TDM operation.
 
-Ein lokaler 90-Sekunden-Testton am iMac und derselbe kontinuierliche Ton vom
-Linux-Mini-PC über DisplayPort waren hörbar sauber. Drei Pause-/Fortsetzzyklen
-mit lokaler Wiedergabe am Mini-PC erzeugten dagegen zusätzliche hörbare Störungen.
-Nach Abschalten des WirePlumber-Suspend für diesen Ausgang und Setzen von
-`snd_hda_intel.power_save=0` blieb die Wiederholung laut Besitzer sauber; der
-ALSA-Ausgang blieb auch in den Pausen RUNNING mit unverändertem Startzeitpunkt.
-Diese Vergleichstests liefen mit 100 ms Zielpuffer am iMac. Anschließend wurde
-der Zielpuffer auf die ursprünglichen 50 ms zurückgestellt. Die Anleitung für
-den Abspielrechner steht in der README; beide Maßnahmen wurden zusammen geprüft,
-ihr jeweiliger Einzelbeitrag ist nicht bestimmt.
+## Pause/resume comparison on October 6, 2026
+
+A local 90-second tone on the iMac and the same continuous tone sent from the
+Linux mini-PC over DisplayPort were audibly clean. Three pause/resume cycles
+with local playback on the mini-PC produced additional audible glitches.
+After disabling WirePlumber suspend for that output and setting
+`snd_hda_intel.power_save=0`, the owner reported a clean repeat. The ALSA output
+remained RUNNING during pauses with an unchanged trigger timestamp.
+These comparisons used a 100 ms target buffer on the iMac. The target was then
+restored to the original 50 ms. Source-computer instructions are in the README.
+Both changes were tested together; their individual contributions were not isolated.

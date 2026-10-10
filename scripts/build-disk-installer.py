@@ -63,7 +63,7 @@ terminal_output console
 linux /boot/vmlinuz rdinit=/init console=tty0 quiet loglevel=3
 initrd /boot/fast.gz
 boot
-echo "Installer konnte nicht starten."
+echo "Installer failed to start."
 sleep 30
 ''')
     embedded = destination/'embedded.cfg'

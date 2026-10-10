@@ -51,7 +51,7 @@ python3 install-usb.py --device /dev/sdX --dry-run
 sudo python3 install-usb.py --device /dev/sdX
 ```
 
-The installer verifies the downloaded files and asks you to type `LOESCHEN /dev/sdX` before erasing the selected drive.
+The installer verifies the downloaded files and asks you to type `ERASE /dev/sdX` before erasing the selected drive.
 
 Insert the drive into the powered-off iMac and turn it on. If necessary, hold **Option/Alt** and select **EFI Boot**.
 

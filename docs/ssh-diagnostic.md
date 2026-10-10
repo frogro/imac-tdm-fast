@@ -1,19 +1,19 @@
-# Live-Audioanalyse per SSH
+# Live audio analysis over SSH
 
-Die separate Diagnosefassung startet direkt in TDM mit derselben Audioweiterleitung
-wie die normale Version. Zusätzlich erhält der iMac per LAN/DHCP eine IP-Adresse
-und startet SSH. Es gibt keine Testtöne, keine automatische Abschaltung und keine
-Installation auf die interne Platte. Die Bildquelle muss nicht verändert werden.
+The separate diagnostic build boots directly into TDM with the same audio route
+as the normal version. It also obtains an IP address over Ethernet/DHCP and starts
+SSH. It produces no test tones, does not shut down automatically, and does not
+install anything on the internal disk. The video source needs no changes.
 
-Den iMac per LAN-Kabel mit demselben Router wie den Analyse-Rechner verbinden.
-Im Router nach dem neuen LAN-Gerät suchen. Anmeldung als `root` mit dem beim
-Bauen angegebenen SSH-Schlüssel; Passwortanmeldung und Portweiterleitung sind
-deaktiviert. Der normale TDM-Build enthält diesen SSH-Zugang nicht.
+Connect the iMac by Ethernet to the same router as the analysis computer.
+Find the new Ethernet device in the router. Log in as `root` using the SSH key
+specified at build time; password authentication and port forwarding are disabled.
+The normal TDM build does not include this SSH access.
 
-## Privates Image bauen
+## Build a private image
 
-Auf x86_64-Linux mit den normalen Build-Abhängigkeiten und zusätzlich
-`dropbear-bin`, `openssh-client`:
+Use x86_64 Linux with the normal build dependencies plus `dropbear-bin` and
+`openssh-client`:
 
 ```sh
 python3 scripts/build-ssh-diagnostic.py /tmp/tdm-ssh \
@@ -23,28 +23,28 @@ python3 scripts/test-ssh-diagnostic.py /tmp/tdm-ssh \
 sudo python3 scripts/install-usb.py --source /tmp/tdm-ssh --device /dev/sdX
 ```
 
-`/dev/sdX` durch den ausgewählten USB-Stick ersetzen. Der Stick wird gelöscht.
-Am iMac mit Alt/Option ausdrücklich diesen USB-Stick starten; die interne
-Installation bleibt unverändert. Es gilt weiterhin das Label `TDMFAST`, nicht
-`TDMSETUP`. Nach Entfernen des Sticks startet wieder die interne Fassung.
+Replace `/dev/sdX` with the selected USB drive. **The drive will be erased.**
+On the iMac, use Option/Alt to explicitly boot this USB drive; the internal
+installation remains unchanged. The filesystem label stays `TDMFAST`, not
+`TDMSETUP`. Remove the drive to return to the internal version.
 
-Der Builder erzeugt einen eigenen SSH-Hostschlüssel für dieses Image.
-**Das erzeugte Image ist privat und gehört nicht in GitHub:** Es enthält den
-Hostschlüssel und den zugelassenen öffentlichen Benutzerschlüssel. Der private
-Benutzerschlüssel wird weder gelesen noch auf den Stick kopiert. `ssh-host-key.pub`
-im Ausgabeverzeichnis enthält die überprüfbare öffentliche Serveridentität.
+The builder generates a dedicated SSH host key for this image.
+**The generated image is private and must not be published on GitHub:** it contains
+the host key and the authorized public user key. The private user key is neither
+read nor copied to the drive. `ssh-host-key.pub` in the output directory contains
+the public server identity for verification.
 
-## Verbinden und auslesen
+## Connect and inspect
 
-Die Adresse aus dem Router anstelle von `192.168.178.X` einsetzen.
-Den Fingerabdruck zuerst mit der lokal erzeugten Datei vergleichen:
+Replace `192.168.178.X` with the address shown by the router.
+First compare the server fingerprint with the locally generated file:
 
 ```sh
 ssh-keygen -lf /tmp/tdm-ssh/ssh-host-key.pub
 ssh -i ~/.ssh/id_ed25519 root@192.168.178.X
 ```
 
-In der SSH-Shell:
+In the SSH shell:
 
 ```sh
 tdm-audio-status
@@ -52,27 +52,27 @@ cat /run/ssh.log
 cat /run/audio-loop.txt
 ```
 
-`tdm-audio-status` liest Mixerwerte, PCM-Status und Pufferparameter,
-Prozessliste sowie Temperaturlog. Es verändert keine Regler und startet keine
-Aufnahme. Für einen zeitlichen Vergleich auf dem Analyse-Rechner speichern:
+`tdm-audio-status` reads mixer settings, PCM state and buffer parameters,
+the process list, and temperature logs. It does not change controls or start
+recording. To capture a time series on the analysis computer:
 
 ```sh
 ssh root@192.168.178.X 'while :; do tdm-audio-status; sleep 2; done' > audio-live.txt
 ```
 
-Mit Strg+C beenden und die Uhrzeit hörbarer Schwankungen notieren. Logs im iMac
-liegen ausschließlich im RAM und verschwinden beim Ausschalten. Die SSH-Shell
-hat Administratorrechte; Schreibbefehle auf Datenträger gehören nicht zur Analyse.
+Stop with Ctrl+C and note the times of audible fluctuations. Logs on the iMac
+exist only in RAM and disappear at poweroff. The SSH shell has administrator
+privileges; disk-writing commands are not part of this analysis.
 
-## Technik und Prüfung
+## Implementation and testing
 
-Die Netzwerkmodule `tg3` (reale Broadcom-LAN-Hardware) und `e1000` (QEMU)
-stammen aus dem bestehenden TinyCore-6.6.8-Initramfs; Herkunft und SHA-256
-stehen in `vendor/network/manifest.json`. Die Kernelquellen sind bereits im
-Quellen-Release vorhanden. Dropbear und seine Bibliotheken stammen aus dem
-Build-System und behalten ihre Paketlizenzen. Mit `--tools-root` kann statt
-installierter Pakete ein Verzeichnis mit entpackten Paketen verwendet werden.
+The `tg3` (physical Broadcom Ethernet) and `e1000` (QEMU) network modules come
+from the existing TinyCore 6.6.8 initramfs. Their source and SHA-256 hashes are
+recorded in `vendor/network/manifest.json`. Kernel sources are already included
+in the source release. Dropbear and its libraries come from the build host and
+retain their package licenses. `--tools-root` accepts a directory of extracted
+packages instead of installed packages.
 
-QEMU prüft DHCP, SSH mit festgelegter Serveridentität, eine interaktive Shell,
-laufende Audiostreams und fehlende Datenträgermounts. Die reale LAN-Verbindung
-und die Ursache der Lautstärkeschwankungen müssen anschließend am iMac geprüft werden.
+QEMU checks DHCP, SSH with a pinned server identity, an interactive shell,
+running audio streams, and the absence of mounted data disks. Physical Ethernet
+connectivity and the cause of volume fluctuations require testing on the iMac.
