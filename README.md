@@ -19,8 +19,8 @@ Both methods run the same TDM system.
 | Model | Status in this project |
 | --- | --- |
 | 27-inch Late 2009, `iMac11,1` | **Tested:** DisplayPort video and audio on board `Mac-F2268DAE`, Cirrus CS4206 (codec `1013:4206`, subsystem `106b:5100`). |
-| 27-inch Late 2009, `iMac10,1` | **Enabled, not tested:** DisplayPort video switching and experimental CS4206 audio forwarding. Uses the same audio route as `iMac11,1`; sound is not verified on this model. |
-| 27-inch Mid 2010, `iMac11,3` | **Enabled, not tested:** DisplayPort video switching and experimental CS4206 audio forwarding. Uses the same route as the tested 2009 model. |
+| 27-inch Late 2009, `iMac10,1` | **Not tested:** DisplayPort video switching and CS4206 audio forwarding. Uses the same audio route as `iMac11,1`. |
+| 27-inch Mid 2010, `iMac11,3` | **Not tested:** DisplayPort video switching and CS4206 audio forwarding. Uses the same route as the tested 2009 model. |
 | TDM-capable iMacs from 2011–2013 | **Not supported by this project.** They require Thunderbolt TDM, not the DisplayPort connection used here. |
 
 An HDMI source requires an active HDMI-to-DisplayPort converter compatible with the iMac's input; a passive cable is not sufficient.
