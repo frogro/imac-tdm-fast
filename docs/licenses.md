@@ -17,7 +17,7 @@ und Lizenzhinweise bleiben in `src/smc/SmcDumpKey.c` und `src/smc/COPYING` erhal
 
 Die vollständigen Kernelquellen einschließlich TinyCore-Patches und Kernelkonfiguration,
 die GRUB-Quellen einschließlich Ubuntu-Patches sowie musl-Quellen sind als Dateien
-im [Quellen-Release](https://github.com/frogro/imac-tdm-fast/releases/tag/sources-v1)
+im [Quellen-Release](https://github.com/frogro/imac-tdm/releases/tag/sources-v1)
 verfügbar. Die ursprünglichen Downloadadressen und SHA-256-Werte stehen in
 [source-archives.json](../source-archives.json). Das sind Entwicklerquellen;
 für die Stick-Installation lädt der Installer nur das kleine Bootpaket.

@@ -15,7 +15,7 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = 'frogro/imac-tdm-fast'
+REPOSITORY = 'frogro/imac-tdm'
 REQUIRED = {'EFI/BOOT/BOOTX64.EFI', 'boot/vmlinuz', 'boot/fast.gz', 'boot/splash.png', 'grub.cfg'}
 OPTIONAL = set()
 COLUMNS = 'NAME,PATH,TYPE,SIZE,TRAN,RO,MODEL,SERIAL,MAJ:MIN,MOUNTPOINTS'
@@ -113,7 +113,7 @@ def payload_files(root=ROOT):
 
 
 def fetch(url, limit):
-    request = urllib.request.Request(url, headers={'User-Agent': 'imac-tdm-fast-installer/1'})
+    request = urllib.request.Request(url, headers={'User-Agent': 'imac-tdm-installer/1'})
     with urllib.request.urlopen(request, timeout=60) as response:
         data = response.read(limit + 1)
     if len(data) > limit:
@@ -177,7 +177,7 @@ def install(device, files, root=ROOT):
         raise ValueError('Die neue Partition ist nicht eindeutig sichtbar. Abbruch.')
     partition = partitions[0]['path']
     run('mkfs.vfat', '-F', '32', '-n', 'TDMFAST', partition)
-    directory = tempfile.mkdtemp(prefix='imac-tdm-fast-usb-')
+    directory = tempfile.mkdtemp(prefix='imac-tdm-usb-')
     destination = Path(directory)
     mounted = False
     try:
@@ -219,7 +219,7 @@ def main(argv=None):
         if destination.exists():
             raise ValueError('Download-Ziel existiert bereits; bitte neues Verzeichnis wählen.')
         destination.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix='.imac-tdm-fast-download-', dir=destination.parent) as temporary:
+        with tempfile.TemporaryDirectory(prefix='.imac-tdm-download-', dir=destination.parent) as temporary:
             staging = Path(temporary) / 'payload'
             staging.mkdir()
             download_payload(staging, args.ref)
@@ -253,7 +253,7 @@ def main(argv=None):
             raise ValueError('Installation benötigt root: mit sudo starten.')
         if not sys.stdin.isatty():
             raise ValueError('Installation benötigt eine interaktive Bestätigung im Terminal.')
-    with tempfile.TemporaryDirectory(prefix='imac-tdm-fast-payload-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='imac-tdm-payload-') as temporary:
         if args.source:
             root = args.source.resolve()
             files = payload_files(root)

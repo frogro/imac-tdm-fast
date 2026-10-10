@@ -40,7 +40,7 @@ Prepare a USB drive of at least 512 MB on a Linux computer. **The selected USB d
 
 ```bash
 sudo apt install python3 curl dosfstools parted util-linux udev
-curl -fL https://raw.githubusercontent.com/frogro/imac-tdm-fast/main/scripts/install-usb.py -o install-usb.py
+curl -fL https://raw.githubusercontent.com/frogro/imac-tdm/main/scripts/install-usb.py -o install-usb.py
 python3 install-usb.py --list
 ```
 
@@ -69,8 +69,8 @@ On an **x86-64 Linux computer** (the commands below use Ubuntu/Debian), prepare 
 
 ```bash
 sudo apt install git python3 busybox-static util-linux dosfstools file grub-efi-amd64-bin grub-common parted udev
-git clone https://github.com/frogro/imac-tdm-fast.git
-cd imac-tdm-fast
+git clone https://github.com/frogro/imac-tdm.git
+cd imac-tdm
 python3 scripts/build-disk-installer.py work/internal-installer
 sudo python3 scripts/install-usb.py --source work/internal-installer --device /dev/sdX
 sudo fatlabel /dev/sdX1 TDMSETUP
