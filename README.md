@@ -1,6 +1,6 @@
 # iMac TDM Fast
 
-Use a **27-inch Late 2009 iMac** as a DisplayPort monitor. The system starts automatically in Target Display Mode (TDM), with **video and audio over DisplayPort** and sound through the iMac speakers.
+Use a **27-inch Late 2009 iMac** as a DisplayPort monitor. The system starts automatically in Target Display Mode (TDM). **Video and audio over DisplayPort have been tested on an iMac11,1 with Cirrus CS4206**, with sound through the iMac speakers.
 
 Choose either installation method:
 
@@ -11,9 +11,23 @@ Both methods run the same TDM system.
 
 ## Requirements
 
-- A 27-inch Late 2009 iMac (`iMac10,1` or `iMac11,1`). The 21.5-inch model is not supported.
+- A 27-inch Late 2009 iMac; see the tested and untested configurations below. The 21.5-inch 2009 model is not supported.
 - A DisplayPort source connected to the iMac's Mini DisplayPort input, using a suitable cable or adapter.
-- Audio forwarding is supported on `iMac11,1` with the Cirrus CS4206 audio codec.
+
+### Tested and potentially compatible models
+
+| Model | Status in this project |
+| --- | --- |
+| 27-inch Late 2009, `iMac11,1` | **Tested:** DisplayPort video and audio on board `Mac-F2268DAE`, Cirrus CS4206 (codec `1013:4206`, subsystem `106b:5100`). |
+| 27-inch Late 2009, `iMac10,1` | **Potentially compatible for video, not tested here.** The display-switching code permits this model, but audio forwarding is not enabled. |
+| 27-inch Mid 2010, `iMac11,3` | A candidate for future work because it has DisplayPort TDM hardware. **Not supported by the current build:** its model is excluded by the display-switching and audio checks. |
+| TDM-capable iMacs from 2011–2013 | **Not supported by this project.** They require Thunderbolt TDM, not the DisplayPort connection used here. |
+
+The CS4206 is not unique to the tested model: [AppleALC documents it in the iMac12,2](https://github.com/acidanthera/AppleALC/blob/master/Resources/PinConfigs.kext/Contents/Info.plist).
+A matching codec name does not establish matching audio wiring or TDM support.
+This build enables audio only for the tested model, board and codec identifiers;
+other machines are not advertised as working audio configurations.
+See also [Apple's TDM connection requirements](https://support.apple.com/en-us/105126) and the [2010 DisplayPort input specification](https://support.apple.com/en-ie/112566).
 
 An HDMI source requires an active HDMI-to-DisplayPort converter compatible with the iMac's input; a passive cable is not sufficient.
 
@@ -24,7 +38,7 @@ An HDMI source requires an active HDMI-to-DisplayPort converter compatible with 
 Prepare a USB drive of at least 512 MB on a Linux computer. **The selected USB drive will be erased.**
 
 ```bash
-sudo apt install python3 dosfstools parted util-linux udev
+sudo apt install python3 curl dosfstools parted util-linux udev
 curl -fL https://raw.githubusercontent.com/frogro/imac-tdm-fast/main/scripts/install-usb.py -o install-usb.py
 python3 install-usb.py --list
 ```
@@ -46,12 +60,15 @@ Use a separate, one-time installation USB drive to install the same system on th
 
 **The internal installer currently accepts only a Seagate ST31000528AS 1 TB SATA disk in a supported iMac. A first installation erases that disk. Back up its contents first.** An existing marked TDM Fast installation is updated without repartitioning.
 
-On a Linux computer, prepare the installer from the repository:
+Apple offered the 27-inch Late 2009 iMac with a **1 TB HDD or optional 2 TB HDD** ([Apple specifications](https://support.apple.com/en-gb/112564)).
+The exact Seagate model above is the disk tested for installation here. Other HDDs or replacement SSDs may be usable after adapting and testing the installer, but **the current HDD installer rejects them**. This restriction does not apply to normal USB boot, which leaves the internal disk unchanged.
+
+On an **x86-64 Linux computer** (the commands below use Ubuntu/Debian), prepare the installer from the repository:
 
 ```bash
+sudo apt install git python3 busybox-static util-linux dosfstools file grub-efi-amd64-bin grub-common parted udev
 git clone https://github.com/frogro/imac-tdm-fast.git
 cd imac-tdm-fast
-sudo apt install python3 busybox-static util-linux dosfstools file grub-efi-amd64-bin grub-common parted udev
 python3 scripts/build-disk-installer.py work/internal-installer
 sudo python3 scripts/install-usb.py --source work/internal-installer --device /dev/sdX
 sudo fatlabel /dev/sdX1 TDMSETUP
