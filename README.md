@@ -1,4 +1,4 @@
-# iMac TDM Fast
+# iMac Target Display Mode (TDM)
 
 Use a **27-inch Late 2009 or Mid 2010 iMac** as a DisplayPort monitor. The system starts automatically in Target Display Mode (TDM). **Video and audio over DisplayPort have been tested on an iMac11,1 with Cirrus CS4206**, with sound through the iMac speakers.
 
